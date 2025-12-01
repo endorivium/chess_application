@@ -1,10 +1,11 @@
 package chess_piece
 
-enum class PieceType {
+enum class PType {
     Bishop,
     King,
     Knight,
     Pawn,
     Queen,
-    Rook
+    Rook,
+    None
 }

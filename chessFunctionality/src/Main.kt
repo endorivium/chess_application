@@ -1,14 +1,16 @@
+import chess_board.ChessBoardManager
 
 
 fun main() {
-    val name = "Kotlin"
-    //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-    // to see how IntelliJ IDEA suggests fixing it.
-    println("Hello, " + name + "!")
+    val manager = ChessBoardManager()
+    manager.initChessBoard()
 
-    for (i in 1..5) {
-        //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-        // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-        println("i = $i")
+    for (i in 0..63) {
+        val file: Int = i/8
+        val rank: Int = i%8
+        if(manager.board[i/8][i%8] != null){
+            val chessPiece = manager.board[i/8][i%8]?.read()
+            println("$file|$rank $chessPiece")
+        }
     }
 }
