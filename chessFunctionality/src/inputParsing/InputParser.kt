@@ -1,4 +1,4 @@
-package input_parsing
+package inputParsing
 
 class InputParser {
 }

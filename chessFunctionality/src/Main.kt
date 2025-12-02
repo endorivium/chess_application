@@ -1,4 +1,4 @@
-import chess_board.ChessBoardManager
+import chessBoard.ChessBoardManager
 
 
 fun main() {
@@ -6,11 +6,13 @@ fun main() {
     manager.initChessBoard()
 
     for (i in 0..63) {
-        val file: Int = i/8
-        val rank: Int = i%8
-        if(manager.board[i/8][i%8] != null){
-            val chessPiece = manager.board[i/8][i%8]?.read()
-            println("$file|$rank $chessPiece")
+        val file: Int = i%8
+        val rank: Int = i/8
+        if(manager.boardConfig[file][rank] != null){
+            val chessPiece = manager.boardConfig[file][rank]?.read()
+            val pieceMoves = manager.boardConfig[file][rank]?.readAvailableMoves()
+            println("$chessPiece")
+            println("$pieceMoves")
         }
     }
 }

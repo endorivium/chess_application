@@ -1,4 +1,4 @@
-package chess_piece
+package chessPiece
 
 enum class PColor {
     White,
