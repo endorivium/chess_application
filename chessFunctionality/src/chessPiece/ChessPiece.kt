@@ -20,7 +20,7 @@ open class ChessPiece(
         var moves = ""
         for (i in availableMoves.indices) {
             val moveName = availableMoves[i].convertToString()
-            moves += "$moveName | "
+            moves += "| $moveName | "
         }
         return moves
     }

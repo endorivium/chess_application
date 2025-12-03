@@ -11,8 +11,7 @@ fun main() {
         if(manager.boardConfig[file][rank] != null){
             val chessPiece = manager.boardConfig[file][rank]?.read()
             val pieceMoves = manager.boardConfig[file][rank]?.readAvailableMoves()
-            println("$chessPiece")
-            println("$pieceMoves")
+            println("$chessPiece $pieceMoves")
         }
     }
 }
