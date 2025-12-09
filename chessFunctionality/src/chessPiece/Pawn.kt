@@ -15,31 +15,34 @@ class Pawn(
     override fun findAvailableMoves() {
         if (color == PColor.White)
             return
-        val targetSquare = if (bFirstMove) SquareCoords(pos.file, pos.rank + 2)
-                            else SquareCoords(pos.file, pos.rank + 1)
+
+        var targetSquare = if (bFirstMove) arrayOf(SquareCoords(pos.file, pos.rank + 1), SquareCoords(pos.file, pos.rank + 2))
+                            else arrayOf(SquareCoords(pos.file, pos.rank + 1))
         var evaluatedSquare: SpaceOccupation
-        if (board.isMoveWithinBounds(targetSquare)) {
-            evaluatedSquare = board.isSquareOccupied(targetSquare, color)
+        if (board.isMoveSequenceWithinBounds(targetSquare)) {
+            evaluatedSquare = board.isSquareOccupiedByEnemy(targetSquare[targetSquare.size-1], color)
             if (!evaluatedSquare.isOccupied) {
-                availableMoves.add(SquareCoords(targetSquare))
+                availableMoves.add(SquareCoords(targetSquare[targetSquare.size-1]))
             }
         }
 
-        targetSquare.file++ //diagonal right if enemy piece
-        if (board.isMoveWithinBounds(targetSquare)) {
-            evaluatedSquare = board.isSquareOccupied(targetSquare, color)
+        //check diagonal right
+        targetSquare = arrayOf(SquareCoords(pos.file + 1, pos.rank + 1))
+        if (board.isMoveSequenceWithinBounds(targetSquare)) {
+            evaluatedSquare = board.isSquareOccupiedByEnemy(targetSquare[targetSquare.size-1], color)
             if (evaluatedSquare.isOccupied
                 && evaluatedSquare.isEnemy) {
-                availableMoves.add(SquareCoords(targetSquare))
+                availableMoves.add(SquareCoords(targetSquare[targetSquare.size-1]))
             }
         }
 
-        targetSquare.file -= 2 //diagonal left if enemy piece
-        if (board.isMoveWithinBounds(targetSquare)) {
-            evaluatedSquare = board.isSquareOccupied(targetSquare, color)
+        //check diagonal left
+        targetSquare = arrayOf(SquareCoords(pos.file - 1, pos.rank + 1))
+        if (board.isMoveSequenceWithinBounds(targetSquare)) {
+            evaluatedSquare = board.isSquareOccupiedByEnemy(targetSquare[targetSquare.size-1], color)
             if (evaluatedSquare.isOccupied
                 && evaluatedSquare.isEnemy) {
-                availableMoves.add(SquareCoords(targetSquare))
+                availableMoves.add(SquareCoords(targetSquare[targetSquare.size-1]))
             }
         }
     }

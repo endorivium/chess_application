@@ -80,19 +80,47 @@ class ChessBoardManager {
         }
     }
 
-    fun isMoveWithinBounds(coords: SquareCoords): Boolean{
-        return coords.file in 0..<8 && coords.rank in 0..<8
+    fun isMoveSequenceWithinBounds(sequence: Array<SquareCoords>): Boolean{
+        for(square in sequence){
+            if(square.file !in 0..<8 && square.rank !in 0..<8)
+                return false
+        }
+
+        return true
+    }
+
+    /*
+    * check if piece can execute sequence unobstructed (e.g. bishop encounters other piece and cannot move passed)
+    */
+    fun isMoveSequenceValid(sequence: Array<SquareCoords>, faction:  PColor, isGrounded: Boolean): Boolean{
+        if(!isGrounded)
+            return true
+
+        var isValid = true
+        for(i in sequence.indices){
+            //if square is occupied and not last move, then sequence invalid bc path obstructed
+            if(boardConfig[sequence[i].file][sequence[i].rank] != null &&
+                i != sequence.size - 1){
+                isValid = false
+                break
+            }
+            //if last move and space occupied by own faction, then invalid bc path obstructed
+            else if(boardConfig[sequence[i].file][sequence[i].rank] != null
+                && boardConfig[sequence[i].file][sequence[i].rank]!!.color == faction) {
+                isValid = false
+                break
+            }
+        }
+
+        return isValid
     }
 
     // TODO: check path to square if isGrounded
-    fun isSquareOccupied(coords: SquareCoords, pieceColor: PColor, isGrounded: Boolean = true): SpaceOccupation {
-        if(!isMoveWithinBounds(coords))
-            throw IndexOutOfBoundsException("$coords is out of bounds")
+    fun isSquareOccupiedByEnemy(targetSquare: SquareCoords, pieceColor: PColor, isGrounded: Boolean = true): SpaceOccupation {
+        if(boardConfig[targetSquare.file][targetSquare.rank] == null)
+            return SpaceOccupation(isOccupied = false, isEnemy = false)
 
-        if(boardConfig[coords.file][coords.rank] == null)
-            return SpaceOccupation(false, false)
-
-        return SpaceOccupation(true, pieceColor == boardConfig[coords.file][coords.rank]!!.color)
+        return SpaceOccupation(true, pieceColor == boardConfig[targetSquare.file][targetSquare.rank]!!.color)
     }
 
     fun isCheckMate(): Boolean{
