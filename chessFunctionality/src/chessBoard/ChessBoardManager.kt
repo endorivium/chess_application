@@ -29,6 +29,8 @@ val defaultBoardConfig = arrayOf(
     wRook, wKnight, wBishop, wKing, wQueen, wBishop, wKnight, wRook
 )
 
+data class SpaceOccupation(val isOccupied: Boolean, val isEnemy: Boolean);
+
 class ChessBoardManager {
     var boardConfig = Array(8) { Array<ChessPiece?>(8) { null } }
         private set
@@ -66,18 +68,31 @@ class ChessBoardManager {
         }
     }
 
+    fun printChessBoard() {
+        for (i in 0..63) {
+            val file: Int = i % 8
+            val rank: Int = i / 8
+            if (boardConfig[file][rank] != null) {
+                val chessPiece = boardConfig[file][rank]?.read()
+                val pieceMoves = boardConfig[file][rank]?.readAvailableMoves()
+                println("$chessPiece $pieceMoves")
+            }
+        }
+    }
+
     fun isMoveWithinBounds(coords: SquareCoords): Boolean{
         return coords.file in 0..<8 && coords.rank in 0..<8
     }
 
-    fun isSquareOccupied(coords: SquareCoords): Pair<Boolean, PColor>{
+    // TODO: check path to square if isGrounded
+    fun isSquareOccupied(coords: SquareCoords, pieceColor: PColor, isGrounded: Boolean = true): SpaceOccupation {
         if(!isMoveWithinBounds(coords))
             throw IndexOutOfBoundsException("$coords is out of bounds")
 
         if(boardConfig[coords.file][coords.rank] == null)
-            return Pair(false, PColor.None)
+            return SpaceOccupation(false, false)
 
-        return Pair(true, boardConfig[coords.file][coords.rank]!!.color)
+        return SpaceOccupation(true, pieceColor == boardConfig[coords.file][coords.rank]!!.color)
     }
 
     fun isCheckMate(): Boolean{
