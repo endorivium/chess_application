@@ -1,7 +1,7 @@
-import chessBoard.ChessBoardManager
+import inputParsing.InputParser
+
 
 fun main() {
-    val manager = ChessBoardManager()
-    manager.initChessBoard()
-    manager.printChessBoard()
+val parser = InputParser()
+    parser.readNextMove()
 }
