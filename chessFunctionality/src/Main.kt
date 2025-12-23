@@ -1,7 +1,7 @@
-import inputParsing.InputParser
+import inputHandler.InputHandler
 
 
 fun main() {
-val parser = InputParser()
+val parser = InputHandler()
     parser.readNextMove()
 }

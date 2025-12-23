@@ -1,0 +1,4 @@
+package gameState
+
+class BoardStateManager {
+}
