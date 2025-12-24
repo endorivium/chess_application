@@ -1,7 +1,8 @@
+import gameState.GameManager
 import inputHandler.InputHandler
 
 
 fun main() {
-val parser = InputHandler()
-    parser.readNextMove()
+    val gameManager = GameManager()
+    gameManager.startGame()
 }

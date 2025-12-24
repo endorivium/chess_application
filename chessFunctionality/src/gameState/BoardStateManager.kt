@@ -1,4 +1,5 @@
 package gameState
 
 class BoardStateManager {
+
 }
