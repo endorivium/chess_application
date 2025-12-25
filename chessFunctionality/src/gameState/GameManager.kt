@@ -11,7 +11,7 @@ class GameManager(
 
     fun startGame(){
         val playerMove = inputHandler.readInput()
-        println(playerMove.startCoord + "|" + playerMove.endCoord)
+        println(playerMove.initialCoord + "|" + playerMove.targetCoord)
         //TODO: get chess piece then check if move valid, if yes execute, if no send error and redo readInput
     }
 }

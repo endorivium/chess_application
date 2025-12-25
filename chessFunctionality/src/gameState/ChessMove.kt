@@ -1,5 +1,19 @@
 package gameState
 
 //TODO: add color and piece type
-class ChessMove(val startCoord: String = "", val endCoord: String = "") {
+//TODO: initialize indices
+class ChessMove(
+    val initialCoord: String = "",
+    val targetCoord: String = "",
+    var initialIndex: Int = -1,
+    var targetIndex: Int = -1) {
+    init{
+        var file = initialCoord[0].code - 97
+        var rank = initialCoord[1].code - 49
+        initialIndex = rank*8 + file
+
+        file = targetCoord[0].code - 97
+        rank = targetCoord[1].code - 49
+        targetIndex = rank*8 + file
+    }
 }
