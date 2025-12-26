@@ -1,10 +1,16 @@
 package gamePieces
 
 enum class EPieceType {
-    Bishop,
-    King,
-    Knight,
-    Pawn,
-    Queen,
-    Rook
+    wBishop,
+    wKing,
+    wKnight,
+    wPawn,
+    wQueen,
+    wRook,
+    bBishop,
+    bKing,
+    bKnight,
+    bPawn,
+    bQueen,
+    bRook
 }

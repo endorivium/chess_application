@@ -1,11 +1,12 @@
 package gameState
 
+import gamePieces.EPieceType
 import kotlin.math.round
 
 
-class BoardStateManager {
-    //TODO: boardstate variable
-
+class BoardStateManager(
+    var boardMap: MutableMap<EPieceType, ULong> = mutableMapOf()
+) {
     companion object {
         //region BOARD_FILES_MASKS
         const val FILE_A: ULong = 0x8080808080808080u
@@ -30,77 +31,50 @@ class BoardStateManager {
         //endregion
     }
 
-    var
+    //region BlackBoard
+    var wBishopBoard: ULong = 0x2400000000000000u
+    var wKingBoard: ULong = 0x800000000000000u
+    var wKnightBoard: ULong = 0x4200000000000000u
+    var wPawnBoard: ULong = 0xFF000000000000u
+    var wQueenBoard: ULong = 0x1000000000000000u
+    var wRookBoard: ULong = 0x8100000000000000u
+    //endregion
 
+    //region WhiteBoard
+    var bBishopBoard: ULong = 0x24u
+    var bKingBoard: ULong = 0x8u
+    var bKnightBoard: ULong = 0x42u
+    var bPawnBoard: ULong = 0xFF00u
+    var bQueenBoard: ULong = 0x10u
+    var bRookBoard: ULong = 0x81u
+    //endregion
 
-    //takes a ULong (64 bits) and a bitIndex and returns whether the bit at the given index is 0 or 1
-    fun getBit(b: ULong, bitIndex: Int): Boolean{
-        //find how much bit must be shifted, so that looked at bit is least significant
-        val shift: Int = 63 - bitIndex
-        var bitLookup: ULong = b
-        //shift it right (max 31)
-        bitLookup = bitLookup shr shift.coerceIn(0..31)
-
-        //if shift is > 31, then it shifts the remaining indices left
-        if(shift > 31){
-            val secondShift: Int = shift - 31
-            bitLookup = (bitLookup shr secondShift)
-        }
-
-        val masked = (bitLookup and 1.toULong())
-        return masked.toInt() != 0
+    init{
+        boardMap = mutableMapOf(
+            EPieceType.wBishop to wBishopBoard,
+            EPieceType.wKing to wKingBoard,
+            EPieceType.wKnight to wKnightBoard,
+            EPieceType.wPawn to wPawnBoard,
+            EPieceType.wQueen to wQueenBoard,
+            EPieceType.wRook to wRookBoard,
+            EPieceType.bBishop to bBishopBoard,
+            EPieceType.bKing to bKingBoard,
+            EPieceType.bKnight to bKnightBoard,
+            EPieceType.bPawn to bPawnBoard,
+            EPieceType.bQueen to bQueenBoard,
+            EPieceType.bRook to bRookBoard
+        )
     }
 
-    fun swapBit(b: ULong, bitIndex: Int, targetIndex: Int): ULong{
-        var board: ULong = b
-        var longBitMask = makeLongBitMask(bitIndex).inv()
-        board = board and longBitMask // Turn bit A off
-        printBitDebug("bit mask:",longBitMask)
-        printBitDebug("turned bit off:", board)
-
-        longBitMask = makeLongBitMask(targetIndex)
-        board  = board or longBitMask  // Turn bit B on
-        printBitDebug("bit mask:", longBitMask) //debug
-        printBitDebug("turned bit on (swap):", board) //debug
-        return board
+    fun getPieceBoard(piece: EPieceType): ULong{
+        //TODO: make sure that board is not null
+        return boardMap[piece]!!
     }
 
-    fun makeLongBitMask(bitIndex: Int): ULong{
-        val shift: Int = 63 - bitIndex
-        var bit = (1 shl shift.coerceIn(0..31)).toULong()
-        bit = correctULongConversion(bit)
-        printBitDebug("corrected:", bit)
-        printBitDebug("first shift:", bit)
-
-        //if shift is > 31, then it shifts the remaining indices left
-        if(shift > 31){
-            val secondShift: Int = shift - 31
-            bit = bit shl secondShift
-        }
-        printBitDebug("second shift:", bit)
-        return bit
-    }
-
-    /*
-    conversion from Int to ULong fils the 32 most significant bits that were added with the sign bit leading to wrong
-    calculations within the bitboard
-    this function fixes this by cancelling out the added sign bits
-     */
-    fun correctULongConversion(bit: ULong): ULong{
-        var correctedBit = bit
-        val bitCorrection = bit shl 1
-        correctedBit = bit xor bitCorrection
-        return correctedBit
-    }
-
-    fun printBitDebug(prefixTxt: String, bit: ULong){
-        val numIndentation = round(40f/ prefixTxt.length)
-        var indentation = ""
-        for(i in 1..numIndentation.toInt()){
-            indentation += "\t"
-        }
-
-        println(prefixTxt + indentation + bit.toString(2).padStart(64, '0'))
+    fun getBoardState(): ULong{
+        val whiteBoard = wBishopBoard xor wKingBoard xor wKnightBoard xor wPawnBoard xor wQueenBoard xor wRookBoard
+        val blackBoard = bBishopBoard xor bKingBoard xor bKnightBoard xor bPawnBoard xor bQueenBoard xor bRookBoard
+        return whiteBoard xor blackBoard
     }
 }
 
