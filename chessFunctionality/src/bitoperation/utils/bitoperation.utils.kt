@@ -21,7 +21,7 @@ fun getBit(b: ULong, bitIndex: Int): Boolean{
     return masked.toInt() != 0
 }
 
-fun setBit(b: ULong = 0x0u, bitIndex: Int): ULong{
+fun setBit(b: ULong = empty, bitIndex: Int): ULong{
     var board: ULong = b
     val longBitMask = makeLongBitMask(bitIndex)
     board  = board or longBitMask  // Turn bit B on
@@ -47,16 +47,16 @@ fun swapBit(b: ULong, bitIndex: Int, targetIndex: Int): ULong{
 fun makeLongBitMask(bitIndex: Int): ULong{
     val shift: Int = 63 - bitIndex
     var bit = (1 shl shift.coerceIn(0..31)).toULong()
-    bit = correctULongConversion(bit)
     //printBitDebug(bit, "corrected:")
     //printBitDebug(bit, "first shift:")
 
     //if shift is > 31, then it shifts the remaining indices left
-    if(shift > 31){
+    if(shift >= 31){
+        bit = correctULongConversion(bit)
         val secondShift: Int = shift - 31
         bit = bit shl secondShift
     }
-    //printBitDebug(bit, "second shift:")
+    //printBitDebug(bit, "long bit mask:")
     return bit
 }
 
@@ -68,6 +68,7 @@ this function fixes this by cancelling out the added sign bits
 fun correctULongConversion(bit: ULong): ULong{
     val bitCorrection = bit shl 1
     val correctedBit = bit xor bitCorrection
+    //printBitDebug(bitCorrection, "bitCorrection: ")
     return correctedBit
 }
 
@@ -78,5 +79,11 @@ fun printBitDebug(bit: ULong, prefixTxt: String = "Initial Value:"){
         indentation += "\t"
     }
 
-    println(prefixTxt + indentation + bit.toString(2).padStart(64, '0'))
+    val bitText = bit.toString(2).padStart(64, '0')
+
+    println(prefixTxt + indentation)
+    for(i in bitText.length-1 downTo 0){
+        if(i == 0 || i%8 == 0)
+        println(bitText.substring(i, i+8))
+    }
 }

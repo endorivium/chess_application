@@ -1,7 +1,9 @@
 package gameState
 
+import bitoperation.utils.empty
+import bitoperation.utils.printBitDebug
 import gamePieces.EPieceType
-import kotlin.math.round
+import gamePieces.toEnum
 
 
 class BoardStateManager(
@@ -51,19 +53,35 @@ class BoardStateManager(
 
     init{
         boardMap = mutableMapOf(
-            EPieceType.wBishop to wBishopBoard,
-            EPieceType.wKing to wKingBoard,
-            EPieceType.wKnight to wKnightBoard,
-            EPieceType.wPawn to wPawnBoard,
-            EPieceType.wQueen to wQueenBoard,
-            EPieceType.wRook to wRookBoard,
-            EPieceType.bBishop to bBishopBoard,
-            EPieceType.bKing to bKingBoard,
-            EPieceType.bKnight to bKnightBoard,
-            EPieceType.bPawn to bPawnBoard,
-            EPieceType.bQueen to bQueenBoard,
-            EPieceType.bRook to bRookBoard
+            EPieceType.WBishop to wBishopBoard,
+            EPieceType.WKing to wKingBoard,
+            EPieceType.WKnight to wKnightBoard,
+            EPieceType.WPawn to wPawnBoard,
+            EPieceType.WQueen to wQueenBoard,
+            EPieceType.WRook to wRookBoard,
+            EPieceType.BBishop to bBishopBoard,
+            EPieceType.BKing to bKingBoard,
+            EPieceType.BKnight to bKnightBoard,
+            EPieceType.BPawn to bPawnBoard,
+            EPieceType.BQueen to bQueenBoard,
+            EPieceType.BRook to bRookBoard
         )
+    }
+
+    fun getEnemyPieceBoard(piece: EPieceType): ULong{
+        var enemyBoard: ULong = empty
+        if(piece.ordinal in 0..5){
+            for(i in 6..11){
+                enemyBoard = enemyBoard xor getPieceBoard(i.toEnum<EPieceType>()!!)
+            }
+        }
+        else{
+            for(i in 0..5){
+                enemyBoard = enemyBoard xor getPieceBoard(i.toEnum<EPieceType>()!!)
+            }
+        }
+        printBitDebug(enemyBoard, "enemy board to $piece")
+        return enemyBoard
     }
 
     fun getPieceBoard(piece: EPieceType): ULong{

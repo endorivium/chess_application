@@ -2,17 +2,36 @@ package gamePieces
 
 import bitoperation.utils.empty
 import bitoperation.utils.getBit
+
 import bitoperation.utils.setBit
 import gameState.ChessMove
 
-class Pawn: ChessPiece() {
+class Pawn(
+    val piece: EPieceType,
+    var mod: Int = 1
+): ChessPiece() {
+    init{
+        if(piece == EPieceType.BPawn || piece == EPieceType.WPawn) {
+            mod = if(piece.compareTo(EPieceType.BPawn) == 0) -1 else 1
+        } else {
+            throw IllegalArgumentException("Pawn must be assigned Pawn enum value (WPawn, BPawn).")
+        }
+    }
+
     override fun getPossibleMoves(posIndex: Int): ULong {
-        return getPush(posIndex) xor getAttack(posIndex)
+        val push = getPush(posIndex)
+        var attack = getAttack(posIndex)
+        attack = attack and boardStateManager.getEnemyPieceBoard(piece)
+
+        //gets pushes that are actually possible by combining (xor) and then excluding (and)
+        var possibleMoves: ULong = (push xor boardStateManager.getBoardState()) and push
+        possibleMoves = possibleMoves xor attack
+        return possibleMoves
     }
 
     fun getPush(posIndex: Int): ULong {
-        val singlePush = pushSingle(posIndex, EPieceType.wPawn)
-        val doublePush = pushDouble(posIndex, EPieceType.wPawn)
+        val singlePush = pushSingle(posIndex, EPieceType.WPawn)
+        val doublePush = pushDouble(posIndex, EPieceType.WPawn)
         val boardState = boardStateManager.getBoardState()
         var forwardMoves = singlePush xor doublePush
         forwardMoves = (forwardMoves xor boardState) and forwardMoves
@@ -22,19 +41,20 @@ class Pawn: ChessPiece() {
 
     fun getAttack(posIndex: Int): ULong {
         var leftAttack: ULong = empty
-        if(posIndex%8 != 0 && posIndex <= 55){
-            leftAttack = setBit(bitIndex = posIndex + 7)
+        if(posIndex%8 != 0 && posIndex in 8..55){
+            leftAttack = setBit(bitIndex = posIndex + mod*7)
         }
 
         var rightAttack: ULong = empty
-        if(posIndex%7 != 0 && posIndex <= 55){
-            rightAttack = setBit(bitIndex = posIndex + 9)
+        if(posIndex%7 != 0 && posIndex in 8..55){
+            rightAttack = setBit(bitIndex = posIndex + mod*9)
         }
 
         val attack: ULong = leftAttack xor rightAttack xor enPassantMove(posIndex)
         return attack
     }
 
+    //TODO: enPassant should only work if pawn piece was moves in previous move by enemy
     fun enPassantMove(posIndex: Int): ULong {
         val boardState = boardStateManager.getBoardState()
         val enPassantIndexLeft = if(posIndex%8 != 0) posIndex - 1 else -1
@@ -51,26 +71,28 @@ class Pawn: ChessPiece() {
     }
 
     fun pushSingle(posIndex: Int, piece: EPieceType): ULong{
-        //TODO: implement invert for black pieces
         var singlePush: ULong = empty
-        val rank = posIndex/8
-        if(rank < 8){
-            singlePush = singlePush xor setBit(singlePush, posIndex + 8)
+        if(isMoveWithinBoard(posIndex)){
+            singlePush = singlePush xor setBit(singlePush, posIndex + mod*8)
         }
+        //printBitDebug(singlePush, "pushSingle: ")
         return singlePush
     }
 
     fun pushDouble(posIndex: Int, piece: EPieceType): ULong{
-        //TODO: implement invert for black pieces
         var doublePush: ULong = empty
-        val rank = posIndex/8
-        if(rank == 1){
-            doublePush = setBit(doublePush, posIndex + 16)
+        if(posIndex in 8..15 || posIndex in 48..55){
+            doublePush = setBit(doublePush, posIndex + mod*16)
         }
+        //printBitDebug(doublePush, "pushDouble: ")
         return doublePush
     }
 
     override fun canExecuteMove(move: ChessMove): Boolean {
         return super.canExecuteMove(move)
+    }
+
+    fun isMoveWithinBoard(posIndex: Int): Boolean {
+        return posIndex in 8..55
     }
 }
