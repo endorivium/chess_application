@@ -12,9 +12,9 @@ enum class EPieceType {
     BKnight,
     BPawn,
     BQueen,
-    BRook
-}
+    BRook;
 
-inline fun <reified T: Enum<T>> Int.toEnum(): T?{
-    return enumValues<T>().firstOrNull { it.ordinal == this }
+    companion object{
+        fun fromInt(value: Int) = entries.firstOrNull { it.ordinal == value }
+    }
 }

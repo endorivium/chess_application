@@ -5,7 +5,6 @@ import java.util.Locale.getDefault
 import kotlin.system.exitProcess
 
 class InputHandler(
-    val moveHistory: MutableList<ChessMove> = mutableListOf(),
     val commandKeywords: Array<String> = arrayOf("help", "check", "an", "quit")) {
     //TODO: check input for errors and invalidity
     //TODO: convert input to coordinates
@@ -44,17 +43,16 @@ class InputHandler(
         readInput()
     }
 
-    fun handleMoveCmd(command: String): ChessMove{
+    fun handleMoveCmd(command: String): ChessMove?{
         val moveCoord = extractMove(command)
 
         if(moveCoord.first) {
-            moveHistory.add(moveCoord.second!!)
-        } else {
-            println("Move was not in algebraic notation. Please enter 'an' for more info on the subject.")
-            readInput()
+            return moveCoord.second!!
         }
 
-        return moveCoord.second!!
+        println("Move was not in algebraic notation. Please enter 'an' for more info on the subject.")
+        readInput()
+        return null
     }
 
     fun extractMove(input: String): Pair<Boolean, ChessMove?> {
@@ -96,13 +94,13 @@ class InputHandler(
         return true
     }
 
-    fun handleInput(input: String): ChessMove {
+    fun handleInput(input: String): ChessMove? {
         val normedInput = input.lowercase(getDefault())
 
         val keyword = extractKeyword(normedInput)
         println("The following command will be executed: " + if(keyword == "") "move chess piece" else keyword) //debug
 
-        var playerMove = ChessMove()
+        var playerMove: ChessMove? = null
         when(keyword){
             commandKeywords[0] -> handleHelpCmd()
             commandKeywords[1] -> handleMoveCheckCmd(normedInput)
@@ -114,7 +112,7 @@ class InputHandler(
     }
 
     //valid moves formats: [field] to [field], move [field] to [field], [field] [field]
-    fun readInput(): ChessMove {
+    fun readInput(): ChessMove? {
         println("Please enter a command (type 'help' for a list of commands):")
         print("> ")
         val input = readln()

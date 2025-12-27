@@ -2,13 +2,12 @@ package gameState
 
 import bitoperation.utils.empty
 import bitoperation.utils.printBitDebug
+import bitoperation.utils.setBit
+import bitoperation.utils.swapBit
 import gamePieces.EPieceType
-import gamePieces.toEnum
 
 
-class BoardStateManager(
-    var boardMap: MutableMap<EPieceType, ULong> = mutableMapOf()
-) {
+class BoardStateManager() {
     companion object {
         //region BOARD_FILES_MASKS
         const val FILE_A: ULong = 0x8080808080808080u
@@ -51,64 +50,81 @@ class BoardStateManager(
     var bRookBoard: ULong = 0x81u
     //endregion
 
-    init{
-        boardMap = mutableMapOf(
-            EPieceType.WBishop to wBishopBoard,
-            EPieceType.WKing to wKingBoard,
-            EPieceType.WKnight to wKnightBoard,
-            EPieceType.WPawn to wPawnBoard,
-            EPieceType.WQueen to wQueenBoard,
-            EPieceType.WRook to wRookBoard,
-            EPieceType.BBishop to bBishopBoard,
-            EPieceType.BKing to bKingBoard,
-            EPieceType.BKnight to bKnightBoard,
-            EPieceType.BPawn to bPawnBoard,
-            EPieceType.BQueen to bQueenBoard,
-            EPieceType.BRook to bRookBoard
-        )
+    var boards = arrayOf(
+        wBishopBoard,
+        wKingBoard,
+        wKnightBoard,
+        wPawnBoard,
+        wQueenBoard,
+        wRookBoard,
+        bBishopBoard,
+        bKingBoard,
+        bKnightBoard,
+        bPawnBoard,
+        bQueenBoard,
+        bRookBoard
+    )
+
+    lateinit var gm: GameManager
+
+    fun setGameManager(gameManager: GameManager){
+        gm = gameManager
+    }
+
+    fun executeChessMove(move: ChessMove): Boolean{
+        val chessPiece: EPieceType = getChessPieceAt(move.initialIndex) ?: return false
+        val pieceRule = gm.ruleSet.rules[chessPiece]
+            ?: throw IllegalStateException("Chess Piece ($chessPiece) was not found in Rule Set!!")
+
+        val possibleMoves = pieceRule.getPossibleMoves(move.initialIndex)
+        val desiredMove = setBit(empty, move.targetIndex)
+
+        if((possibleMoves and desiredMove).countOneBits() != 0){
+            boards[chessPiece.ordinal] = swapBit(boards[chessPiece.ordinal], move.initialIndex, move.targetIndex)
+            return true
+        }
+        return false
+    }
+
+    fun getChessPieceAt(pieceIndex: Int): EPieceType? {
+       val pieceBit = setBit(empty, pieceIndex)
+
+        for(i in boards.indices){
+            if((pieceBit and boards[i]).countOneBits() >= 1){
+                return EPieceType.fromInt(i)
+            }
+        }
+
+    return null
+    }
+
+    fun getPieceBoard(piece: EPieceType): ULong{
+        //TODO: make sure that board is not null
+        return boards[piece.ordinal]
     }
 
     fun getEnemyPieceBoard(piece: EPieceType): ULong{
         var enemyBoard: ULong = empty
         if(piece.ordinal in 0..5){
             for(i in 6..11){
-                enemyBoard = enemyBoard xor getPieceBoard(i.toEnum<EPieceType>()!!)
+                enemyBoard = enemyBoard xor getPieceBoard(EPieceType.fromInt(i)!!)
             }
         }
         else{
             for(i in 0..5){
-                enemyBoard = enemyBoard xor getPieceBoard(i.toEnum<EPieceType>()!!)
+                enemyBoard = enemyBoard xor getPieceBoard(EPieceType.fromInt(i)!!)
             }
         }
         printBitDebug(enemyBoard, "enemy board to $piece")
         return enemyBoard
     }
 
-    fun getPieceBoard(piece: EPieceType): ULong{
-        //TODO: make sure that board is not null
-        return boardMap[piece]!!
-    }
-
     fun getBoardState(): ULong{
-        val whiteBoard = wBishopBoard xor wKingBoard xor wKnightBoard xor wPawnBoard xor wQueenBoard xor wRookBoard
-        val blackBoard = bBishopBoard xor bKingBoard xor bKnightBoard xor bPawnBoard xor bQueenBoard xor bRookBoard
-        return whiteBoard xor blackBoard
+        var board: ULong = empty
+
+        for(piece in boards){
+            board = board xor piece
+        }
+        return board
     }
 }
-
-/*fun getBitViaMask(b: ULong, bitIndex: Int): Boolean {
-    //shifts bitmask max 31 left
-    val shift: Int = 63 - bitIndex
-    var bitMask: ULong = (1 shl shift.coerceIn(0..31)).toULong()
-
-    //if shift is > 31, then it shifts the remaining indices left
-    if(shift > 31){
-        val secondShift: Int = shift - 31
-        bitMask = (bitMask shl secondShift).toULong()
-    }
-    //masks the two
-    var masked = (b and bitMask)
-    //and then shifts the bit being looked at right, so that it is least significant bit
-    masked = masked shr shift
-    return masked.toInt() != 0
-}*/
