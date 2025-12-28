@@ -1,4 +1,4 @@
-package bitoperation.utils
+package chess.utils
 import kotlin.math.round
 
 //takes a ULong (64 bits) and a bitIndex and returns whether the bit at the given index is 0 or 1
@@ -21,10 +21,10 @@ fun getBit(b: ULong, bitIndex: Int): Boolean{
     return masked.toInt() != 0
 }
 
-fun setBit(b: ULong = empty, bitIndex: Int): ULong{
+fun flipBit(b: ULong = empty, bitIndex: Int): ULong{
     var board: ULong = b
     val longBitMask = makeLongBitMask(bitIndex)
-    board  = board or longBitMask  // Turn bit B on
+    board  = board xor longBitMask  // Turn bit B on
     //printBitDebug( longBitMask, "bit mask:") //debug
     //printBitDebug(board, "set bit:") //debug
     return board

@@ -2,7 +2,7 @@ package gamePieces
 
 import gameState.GameManager
 
-class RuleSet(gameManager: GameManager) {
+class RuleBook(gameManager: GameManager) {
     val rules = mapOf(
         EPieceType.WBishop to ChessPiece(gameManager, EPieceType.WBishop),
         EPieceType.WKing to ChessPiece(gameManager, EPieceType.WKing),

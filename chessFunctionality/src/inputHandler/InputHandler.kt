@@ -1,5 +1,6 @@
 package inputHandler
 
+import chess.utils.isInAlgebraicNotation
 import gameState.ChessMove
 import java.util.Locale.getDefault
 import kotlin.system.exitProcess
@@ -30,7 +31,7 @@ class InputHandler(
         readInput()
     }
 
-    fun handleMoveCheckCmd(command: String){
+    fun handleMoveCheckCmd(input: String){
         //TODO: get possible moves from chess piece on square
     }
 
@@ -43,8 +44,8 @@ class InputHandler(
         readInput()
     }
 
-    fun handleMoveCmd(command: String): ChessMove?{
-        val moveCoord = extractMove(command)
+    fun handleMoveCmd(input: String): ChessMove?{
+        val moveCoord = extractMove(input)
 
         if(moveCoord.first) {
             return moveCoord.second!!
@@ -79,21 +80,6 @@ class InputHandler(
         return input.length == 4
     }
 
-    fun isInAlgebraicNotation(input: String): Boolean {
-          for(i in input.indices) {
-            if(i%2 == 0){
-                if(input[i] !in 'a'..'h'){
-                    return false
-                }
-            } else {
-                if(input[i] !in '1'..'8'){
-                    return false
-                }
-            }
-        }
-        return true
-    }
-
     fun handleInput(input: String): ChessMove? {
         val normedInput = input.lowercase(getDefault())
 
@@ -111,7 +97,7 @@ class InputHandler(
         return playerMove
     }
 
-    //valid moves formats: [field] to [field], move [field] to [field], [field] [field]
+    //valid moves formats: [field] to [field], move [field] to [field], [field] [field], [field][field]
     fun readInput(): ChessMove? {
         println("Please enter a command (type 'help' for a list of commands):")
         print("> ")

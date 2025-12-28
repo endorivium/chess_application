@@ -1,9 +1,10 @@
 package gameState
 
-import bitoperation.utils.empty
-import bitoperation.utils.printBitDebug
-import bitoperation.utils.setBit
-import bitoperation.utils.swapBit
+import chess.utils.empty
+import chess.utils.printBitDebug
+import chess.utils.flipBit
+import chess.utils.swapBit
+import gamePieces.EMoveType
 import gamePieces.EPieceType
 
 
@@ -71,39 +72,60 @@ class BoardStateManager() {
         gm = gameManager
     }
 
-    fun executeChessMove(move: ChessMove): Boolean{
-        val chessPiece: EPieceType = getChessPieceAt(move.initialIndex) ?: return false
-        val pieceRule = gm.ruleSet.rules[chessPiece]
-            ?: throw IllegalStateException("Chess Piece ($chessPiece) was not found in Rule Set!!")
+    fun execChessMove(move: ChessMove): Boolean{
+        val chessPiece: EPieceType = getPieceAt(move.initialIndex)
+            ?: return false
 
-        val possibleMoves = pieceRule.getPossibleMoves(move.initialIndex)
-        val desiredMove = setBit(empty, move.targetIndex)
+        val pieceRule = gm.ruleBook.rules[chessPiece]
+            ?: throw IllegalStateException("Chess Piece ($chessPiece) was not found in Rule Set!")
 
-        if((possibleMoves and desiredMove).countOneBits() != 0){
-            boards[chessPiece.ordinal] = swapBit(boards[chessPiece.ordinal], move.initialIndex, move.targetIndex)
+        val moveExec = pieceRule.canExecuteMove(move)
+        if(moveExec.first){
+            move(moveExec.second!!, chessPiece, move)
             return true
         }
         return false
     }
 
-    fun getChessPieceAt(pieceIndex: Int): EPieceType? {
-       val pieceBit = setBit(empty, pieceIndex)
+    fun move(type: EMoveType, piece: EPieceType, move: ChessMove){
+        when(type){
+            EMoveType.Push -> pushPc(piece, move)
+            else -> execAttack(piece, move)
+        }
+    }
+
+    fun pushPc(piece: EPieceType, move: ChessMove){
+        boards[piece.ordinal] = swapBit(boards[piece.ordinal], move.initialIndex, move.targetIndex)
+    }
+
+    fun execAttack(piece: EPieceType, move: ChessMove){
+        val enemy = getPieceAt(move.targetIndex)
+            ?: throw IllegalStateException("There was no enemy to attack at " + move.targetIndex)
+
+        boards[piece.ordinal] = swapBit(boards[piece.ordinal], move.initialIndex, move.targetIndex)
+        boards[enemy.ordinal] = flipBit(boards[enemy.ordinal], move.targetIndex)
+    }
+
+    fun getPieceAt(pieceIndex: Int): EPieceType? {
+       val pieceBit = flipBit(empty, pieceIndex)
 
         for(i in boards.indices){
             if((pieceBit and boards[i]).countOneBits() >= 1){
                 return EPieceType.fromInt(i)
             }
         }
-
     return null
     }
 
     fun getPieceBoard(piece: EPieceType): ULong{
-        //TODO: make sure that board is not null
+        if(piece.ordinal !in boards.indices){
+            throw IllegalStateException("Piece $piece was not found in Board Set!")
+        }
+
         return boards[piece.ordinal]
     }
 
-    fun getEnemyPieceBoard(piece: EPieceType): ULong{
+    fun getEnemyBoard(piece: EPieceType): ULong{
         var enemyBoard: ULong = empty
         if(piece.ordinal in 0..5){
             for(i in 6..11){
@@ -115,7 +137,7 @@ class BoardStateManager() {
                 enemyBoard = enemyBoard xor getPieceBoard(EPieceType.fromInt(i)!!)
             }
         }
-        printBitDebug(enemyBoard, "enemy board to $piece")
+        //printBitDebug(enemyBoard, "enemy board to $piece: ")
         return enemyBoard
     }
 
