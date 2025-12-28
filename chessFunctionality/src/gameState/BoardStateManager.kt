@@ -1,9 +1,11 @@
 package gameState
 
 import chess.utils.empty
-import chess.utils.printBitDebug
 import chess.utils.flipBit
+import chess.utils.isWithinBoard
+import chess.utils.omniDirectional
 import chess.utils.swapBit
+import chess.utils.willFileOverflow
 import gamePieces.EMoveType
 import gamePieces.EPieceType
 
@@ -32,6 +34,12 @@ class BoardStateManager() {
         const val RANK_8: ULong = 0xFF00000000000000u
         //endregion
     }
+
+    //region GameStateVariables
+    var kingMoved = false
+    var leftRookMoved = false
+    var rightRookMoved = false
+    //endregion
 
     //region BlackBoard
     var wBishopBoard: ULong = 0x2400000000000000u
@@ -125,9 +133,9 @@ class BoardStateManager() {
         return boards[piece.ordinal]
     }
 
-    fun getEnemyBoard(piece: EPieceType): ULong{
+    fun getEnemyBoard(wPlayer: Boolean): ULong{
         var enemyBoard: ULong = empty
-        if(piece.ordinal in 0..5){
+        if(wPlayer){
             for(i in 6..11){
                 enemyBoard = enemyBoard xor getPieceBoard(EPieceType.fromInt(i)!!)
             }
@@ -139,6 +147,17 @@ class BoardStateManager() {
         }
         //printBitDebug(enemyBoard, "enemy board to $piece: ")
         return enemyBoard
+    }
+
+    fun getEnemyBoards(whiteView: Boolean): Array<ULong> {
+        val enemyBoards = Array<ULong>(6){empty}
+        val indexMod = if(whiteView) 6 else 0
+
+        for(i in enemyBoards.indices){
+            enemyBoards[i] = boards[i+indexMod]
+        }
+
+        return enemyBoards
     }
 
     fun getBoardState(): ULong{
