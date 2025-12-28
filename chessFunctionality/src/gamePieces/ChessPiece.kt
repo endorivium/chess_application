@@ -2,7 +2,6 @@ package gamePieces
 
 import chess.utils.empty
 import chess.utils.flipBit
-import chess.utils.isWPlayer
 import chess.utils.isWithinBoard
 import chess.utils.willFileOverflow
 import gameState.ChessMove
@@ -23,31 +22,59 @@ open class ChessPiece(
     first ULong is normal movement, second is attack
     */
     open fun getPossibleMoves(posIndex: Int): MoveSet {
-        val enemyBoard = gm.bSManager.getEnemyBoard(isWPlayer(piece))
-        var move = empty
-        var attack = empty
+        return MoveSet(findMoves(posIndex), findAttacks(posIndex))
+    }
+
+    open fun findMoves(posIndex: Int): ULong{
+        var moves = empty
+        val board = gm.bSManager.getBoardState()
+
+        for(step in movePattern) {
+            var next = posIndex
+            var move: ULong
+            while (isWithinBoard(next + step)) {
+                //fixes file overflow
+                if (willFileOverflow(next, next + step))
+                    break
+
+                next += step
+                move = flipBit(empty, next)
+
+                if((move and board).countOneBits() != 0)
+                    break
+
+                moves = moves xor move
+            }
+        }
+        return moves
+    }
+
+    open fun findAttacks(posIndex: Int): ULong{
+        var attacks = empty
+        val board = gm.bSManager.getBoardState()
 
         for(step in movePattern){
             var next = posIndex
-            var singleAtk = empty
-            while(isWithinBoard(next)){
+            var attack: ULong
+            while(isWithinBoard(next + step)){
                 //fixes file overflow
                 if(willFileOverflow(next, next + step))
                     break
 
                 next += step
 
-                singleAtk = flipBit(empty, next)
-                singleAtk = singleAtk and enemyBoard
-                if(singleAtk.countOneBits() == 0) {
-                    attack = attack xor singleAtk
+                attack = flipBit(empty, next)
+                attack = attack and board
+                if(attack.countOneBits() != 0
+                    && isEnemy(gm.bSManager.getPieceAt(next)!!)) {
+                    attacks = attacks xor attack
+                    break
                 }
-                move = flipBit(move, next)
             }
         }
-        move = (move and gm.bSManager.getBoardState()) xor move
-        return MoveSet(move, attack)
+        return attacks
     }
+
     fun canExecuteMove(move: ChessMove): Pair<Boolean, EMoveType?> {
         val possibleMoves = getPossibleMoves(move.initialIndex)
         val desiredMove = flipBit(empty, move.targetIndex)

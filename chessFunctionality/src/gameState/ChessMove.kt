@@ -5,6 +5,10 @@ import gamePieces.EPieceType
 
 //TODO: add color and piece type
 //TODO: initialize indices
+
+/*
+chessPiece should only be used to record chess moves
+ */
 data class ChessMove(
     val initialCoord: String = "",
     val targetCoord: String = "",

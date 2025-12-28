@@ -1,13 +1,15 @@
 package gamePieces
 
 import chess.utils.empty
-import chess.utils.printBitDebug
 import chess.utils.flipBit
+import chess.utils.isFile
+import chess.utils.isWPlayer
+import chess.utils.isWithinRanks
 import gameState.ChessMove
 import gameState.GameManager
 import kotlin.math.abs
 
-class Pawn(gm: GameManager, piece: EPieceType): ChessPiece(gm ,piece) {
+class Pawn(gm: GameManager, piece: EPieceType): ChessPiece(gm, piece = piece) {
 
     override fun getPossibleMoves(posIndex: Int): MoveSet {
         val push = getPush(posIndex)
@@ -34,13 +36,13 @@ class Pawn(gm: GameManager, piece: EPieceType): ChessPiece(gm ,piece) {
         if(posIndex%8 != 0 && posIndex in 8..55){
             leftAttack = flipBit(bitIndex = posIndex + mod*7)
         }
-        leftAttack = leftAttack and gm.bSManager.getEnemyBoard(piece)
+        leftAttack = leftAttack and gm.bSManager.getEnemyBoard(isWPlayer(piece))
 
         var rightAttack: ULong = empty
         if(posIndex%7 != 0 && posIndex in 8..55){
             rightAttack = flipBit(bitIndex = posIndex + mod*9)
         }
-        rightAttack = rightAttack and gm.bSManager.getEnemyBoard(piece)
+        rightAttack = rightAttack and gm.bSManager.getEnemyBoard(isWPlayer(piece))
 
         val attack: ULong = leftAttack xor rightAttack xor enPassantMove(posIndex)
         //printBitDebug(attack, "attack: ")
@@ -49,7 +51,7 @@ class Pawn(gm: GameManager, piece: EPieceType): ChessPiece(gm ,piece) {
 
     fun leftEnPassant(posIndex: Int, prevMove: ChessMove): ULong {
         val stepDist = abs(prevMove.initialIndex/8 - prevMove.targetIndex/8)
-        val enPassantIndexLeft = if(posIndex%8 != 0) posIndex - 1 else -1
+        val enPassantIndexLeft = if(!isFile('A', posIndex)) posIndex - 1 else -1
         if(stepDist != 2  || enPassantIndexLeft == -1) return empty
 
         if(prevMove.chessPiece == getEnemyPawn()
@@ -61,7 +63,7 @@ class Pawn(gm: GameManager, piece: EPieceType): ChessPiece(gm ,piece) {
 
     fun rightEnPassant(posIndex: Int, prevMove: ChessMove): ULong {
         val stepDist = abs(prevMove.initialIndex/8 - prevMove.targetIndex/8)
-        val enPassantIndexRight = if(posIndex%7 != 0) posIndex + 1 else -1
+        val enPassantIndexRight = if(!isFile('H', posIndex)) posIndex + 1 else -1
         if(stepDist != 2 || enPassantIndexRight == -1) return empty
 
         if(prevMove.chessPiece == getEnemyPawn()
@@ -84,7 +86,7 @@ class Pawn(gm: GameManager, piece: EPieceType): ChessPiece(gm ,piece) {
 
     fun pushSingle(posIndex: Int): ULong{
         var singlePush: ULong = empty
-        if(isMoveWithinBoard(posIndex)){
+        if(isWithinRanks(posIndex, 2, 7)){
             singlePush = singlePush xor flipBit(singlePush, posIndex + mod*8)
         }
         //printBitDebug(singlePush, "pushSingle: ")
@@ -98,9 +100,5 @@ class Pawn(gm: GameManager, piece: EPieceType): ChessPiece(gm ,piece) {
         }
         //printBitDebug(doublePush, "pushDouble: ")
         return doublePush
-    }
-
-    fun isMoveWithinBoard(posIndex: Int): Boolean {
-        return posIndex in 8..55
     }
 }

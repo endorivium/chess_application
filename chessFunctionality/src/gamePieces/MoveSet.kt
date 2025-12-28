@@ -1,3 +1,3 @@
 package gamePieces
 
-data class MoveSet(val movement: ULong, val attack: ULong)
+data class MoveSet(var movement: ULong, var attack: ULong)
