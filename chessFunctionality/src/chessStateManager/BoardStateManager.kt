@@ -14,7 +14,9 @@ import chessData.EMoveType
 import chessData.EPieceType
 
 
-class BoardStateManager() {
+class BoardStateManager(
+    val gm: GameManager
+) {
     //region GameStateVariables
     var wKingMoved = false
     var wLeftRookMoved = false
@@ -23,7 +25,6 @@ class BoardStateManager() {
     var bKingMoved = false
     var bLeftRookMoved = false
     var bRightRookMoved = false
-    var execRochade = false
     //endregion
 
     //region BlackBoard
@@ -59,12 +60,6 @@ class BoardStateManager() {
         bRookBoard
     )
 
-    lateinit var gm: GameManager
-
-    fun setGameManager(gameManager: GameManager) {
-        gm = gameManager
-    }
-
     fun findPossibleMoves(move: ChessMove, whiteTurn: Boolean): Pair<Boolean, MutableList<Int>> {
         val chessPiece: EPieceType = getPieceAt(move.initialIndex, whiteTurn)
             ?: return Pair(false, mutableListOf())
@@ -91,6 +86,8 @@ class BoardStateManager() {
                 EMoveType.Attack -> execAttack(chessPiece, move, whiteTurn)
                 else -> execRochade(chessPiece, move)
             }
+
+            checkKingRooksMoved(chessPiece, move.initialIndex)
             return true
         }
         return false
@@ -161,11 +158,11 @@ class BoardStateManager() {
     fun getEnemyBoard(white: Boolean): ULong {
         var enemyBoard: ULong = empty
         if (white) {
-            for (i in 0..5) {
+            for (i in 6..11) {
                 enemyBoard = enemyBoard xor getPieceBoard(EPieceType.fromInt(i)!!)
             }
         } else {
-            for (i in 6..11) {
+            for (i in 0..5) {
                 enemyBoard = enemyBoard xor getPieceBoard(EPieceType.fromInt(i)!!)
             }
         }
@@ -194,7 +191,7 @@ class BoardStateManager() {
     fun isSquareUnoccupied(index: Int): Boolean {
         val square = flipBit(empty, index)
         val occupied = square and getBoardState()
-        return occupied.countOneBits() != 0
+        return occupied.countOneBits() == 0
     }
 
     fun areSquaresUnoccupied(indices: Array<Int>): Boolean {
@@ -277,5 +274,26 @@ class BoardStateManager() {
         if (isWPlayer)
             return Triple(wKingMoved, wLeftRookMoved, wRightRookMoved)
         return Triple(bKingMoved, bLeftRookMoved, bRightRookMoved)
+    }
+
+    fun checkKingRooksMoved(piece: EPieceType, index: Int){
+        when (piece) {
+            EPieceType.BKing -> bKingMoved = true
+            EPieceType.WKing -> wKingMoved = true
+            EPieceType.BRook -> if(index == 0) bLeftRookMoved = true
+            else if(index == 7) bRightRookMoved = true
+
+            EPieceType.WRook -> if(index == 56) wLeftRookMoved = true
+            else if(index == 63) wRightRookMoved = true
+            else -> return
+        }
+    }
+
+    fun isCheck(whiteTurn: Boolean): Boolean{
+        //TODO: check
+    }
+
+    fun isCheckMate(whiteTurn: Boolean): Boolean{
+        //TODO: checkmate
     }
 }

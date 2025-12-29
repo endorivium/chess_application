@@ -20,8 +20,7 @@ class GameManager(
     var whiteTurn = true
 
     fun initializeGame() {
-        bsm = BoardStateManager()
-        bsm.setGameManager(this)
+        bsm = BoardStateManager(this)
 
         ruleBook = RuleBook(this)
         renderer = BoardRenderer(this)
@@ -87,9 +86,5 @@ class GameManager(
             true,
             moveHistory[moveHistory.lastIndex]
         )
-    }
-
-    fun notifyRochade() {
-        bsm.execRochade = true
     }
 }

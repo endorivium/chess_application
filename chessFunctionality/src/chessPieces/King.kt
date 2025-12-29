@@ -34,7 +34,6 @@ class King(gm: GameManager, piece: EPieceType) : SingleStep(gm, piece, omniDirec
         if(gm.bsm.areSquaresThreatened(arrayOf(index, index + 1, index + 2),
                 isWhite(piece))) return empty
 
-        gm.notifyRochade()
         return flipBit(empty, index + 2)
     }
 
@@ -50,7 +49,6 @@ class King(gm: GameManager, piece: EPieceType) : SingleStep(gm, piece, omniDirec
         if(gm.bsm.areSquaresThreatened(arrayOf(index - 1, index - 2, index - 3),
                 isWhite(piece))) return empty
 
-        gm.notifyRochade()
         return flipBit(empty, index - 2)
     }
 }
