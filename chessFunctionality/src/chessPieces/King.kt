@@ -2,7 +2,7 @@ package chessPieces
 
 import chess.utils.empty
 import chess.utils.flipBit
-import chess.utils.isWPlayer
+import chess.utils.isWhite
 import chess.utils.omniDirectional
 import chessData.EPieceType
 import chessData.MoveSet
@@ -24,7 +24,7 @@ class King(gm: GameManager, piece: EPieceType) : SingleStep(gm, piece, omniDirec
 
     fun shortRochade(index: Int): ULong {
         //check king and right rook not moved
-        val kingRooksMoved = gm.bsm.haveKingRooksMoved(isWPlayer(piece))
+        val kingRooksMoved = gm.bsm.haveKingRooksMoved(isWhite(piece))
         if(kingRooksMoved.first || kingRooksMoved.third) return empty
 
         //check space between king and rook empty
@@ -32,7 +32,7 @@ class King(gm: GameManager, piece: EPieceType) : SingleStep(gm, piece, omniDirec
 
         //check king space and spaces between unthreatened
         if(gm.bsm.areSquaresThreatened(arrayOf(index, index + 1, index + 2),
-                isWPlayer(piece))) return empty
+                isWhite(piece))) return empty
 
         gm.notifyRochade()
         return flipBit(empty, index + 2)
@@ -40,7 +40,7 @@ class King(gm: GameManager, piece: EPieceType) : SingleStep(gm, piece, omniDirec
 
     fun longRochade(index: Int): ULong {
         //check king and right rook not moved
-        val kingRooksMoved = gm.bsm.haveKingRooksMoved(isWPlayer(piece))
+        val kingRooksMoved = gm.bsm.haveKingRooksMoved(isWhite(piece))
         if(kingRooksMoved.first || kingRooksMoved.second) return empty
 
         //check space between king and rook empty
@@ -48,7 +48,7 @@ class King(gm: GameManager, piece: EPieceType) : SingleStep(gm, piece, omniDirec
 
         //check king space and spaces between unthreatened
         if(gm.bsm.areSquaresThreatened(arrayOf(index - 1, index - 2, index - 3),
-                isWPlayer(piece))) return empty
+                isWhite(piece))) return empty
 
         gm.notifyRochade()
         return flipBit(empty, index - 2)

@@ -1,3 +1,4 @@
+import chess.utils.printBitDebug
 import chessStateManager.GameManager
 import java.lang.Character.toChars
 

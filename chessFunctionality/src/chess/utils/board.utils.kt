@@ -37,7 +37,7 @@ fun getBoardIndices(board: ULong): MutableList<Int> {
     return indices
 }
 
-fun isWPlayer(piece: EPieceType): Boolean {
+fun isWhite(piece: EPieceType): Boolean {
     return piece.ordinal in 0..5
 }
 

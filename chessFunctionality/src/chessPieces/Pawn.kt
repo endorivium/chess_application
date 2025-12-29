@@ -3,7 +3,7 @@ package chessPieces
 import chess.utils.empty
 import chess.utils.flipBit
 import chess.utils.isFile
-import chess.utils.isWPlayer
+import chess.utils.isWhite
 import chess.utils.isWithinRanks
 import chessPieces.baseImplementation.ChessPiece
 import chessData.ChessMove
@@ -39,13 +39,13 @@ class Pawn(gm: GameManager, piece: EPieceType): ChessPiece(gm, piece = piece) {
         if(index%8 != 0 && index in 8..55){
             leftAttack = flipBit(bitIndex = index + mod*7)
         }
-        leftAttack = leftAttack and gm.bsm.getEnemyBoard(isWPlayer(piece))
+        leftAttack = leftAttack and gm.bsm.getEnemyBoard(isWhite(piece))
 
         var rightAttack: ULong = empty
         if(index%7 != 0 && index in 8..55){
             rightAttack = flipBit(bitIndex = index + mod*9)
         }
-        rightAttack = rightAttack and gm.bsm.getEnemyBoard(isWPlayer(piece))
+        rightAttack = rightAttack and gm.bsm.getEnemyBoard(isWhite(piece))
 
         val attack: ULong = leftAttack xor rightAttack xor enPassantMove(index)
         //printBitDebug(attack, "attack: ")

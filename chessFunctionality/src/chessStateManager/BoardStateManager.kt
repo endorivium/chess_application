@@ -3,7 +3,7 @@ package chessStateManager
 import chess.utils.empty
 import chess.utils.flipBit
 import chess.utils.getBoardIndices
-import chess.utils.isWPlayer
+import chess.utils.isWhite
 import chess.utils.isWithinBoard
 import chess.utils.knightPattern
 import chess.utils.omniDirectional
@@ -65,8 +65,8 @@ class BoardStateManager() {
         gm = gameManager
     }
 
-    fun findPossibleMoves(move: ChessMove): Pair<Boolean, MutableList<Int>> {
-        val chessPiece: EPieceType = getPieceAt(move.initialIndex)
+    fun findPossibleMoves(move: ChessMove, whiteTurn: Boolean): Pair<Boolean, MutableList<Int>> {
+        val chessPiece: EPieceType = getPieceAt(move.initialIndex, whiteTurn)
             ?: return Pair(false, mutableListOf())
 
         val pieceRule = gm.ruleBook.rules[chessPiece]
@@ -77,8 +77,8 @@ class BoardStateManager() {
         return Pair(true, getBoardIndices(possibleMoves.move xor possibleMoves.attack))
     }
 
-    fun execChessMove(move: ChessMove): Boolean {
-        val chessPiece: EPieceType = getPieceAt(move.initialIndex)
+    fun execChessMove(move: ChessMove, whiteTurn: Boolean): Boolean {
+        val chessPiece: EPieceType = getPieceAt(move.initialIndex, whiteTurn)
             ?: return false
 
         val pieceRule = gm.ruleBook.rules[chessPiece]
@@ -86,26 +86,22 @@ class BoardStateManager() {
 
         val moveExec = pieceRule.canExecuteMove(move)
         if (moveExec.first) {
-            move(moveExec.second!!, chessPiece, move)
+            when (moveExec.second!!) {
+                EMoveType.Push -> execPush(chessPiece, move)
+                EMoveType.Attack -> execAttack(chessPiece, move, whiteTurn)
+                else -> execRochade(chessPiece, move)
+            }
             return true
         }
         return false
-    }
-
-    fun move(type: EMoveType, piece: EPieceType, move: ChessMove) {
-        when (type) {
-            EMoveType.Push -> execPush(piece, move)
-            EMoveType.Attack -> execAttack(piece, move)
-            else -> execRochade(piece, move)
-        }
     }
 
     fun execPush(piece: EPieceType, move: ChessMove) {
         boards[piece.ordinal] = swapBit(boards[piece.ordinal], move.initialIndex, move.targetIndex)
     }
 
-    fun execAttack(piece: EPieceType, move: ChessMove) {
-        val enemy = getPieceAt(move.targetIndex)
+    fun execAttack(piece: EPieceType, move: ChessMove, whiteTurn: Boolean) {
+        val enemy = getPieceAt(move.targetIndex, whiteTurn)
             ?: throw IllegalStateException("There was no enemy to attack at " + move.targetIndex)
 
         boards[piece.ordinal] = swapBit(boards[piece.ordinal], move.initialIndex, move.targetIndex)
@@ -117,18 +113,30 @@ class BoardStateManager() {
 
         //short rochade (moving right)
         if(move.initialIndex < move.targetIndex){
-            if(isWPlayer(piece)){
+            if(isWhite(piece)){
                 boards[5] = swapBit(boards[5], move.initialIndex + 3, move.targetIndex - 1)
             } else {
                 boards[11] = swapBit(boards[11], move.initialIndex + 3, move.targetIndex - 1)
             }
         } else { //long rochade (moving left)
-            if(isWPlayer(piece)){
+            if(isWhite(piece)){
                 boards[5] = swapBit(boards[5], move.initialIndex - 4, move.targetIndex + 1)
             } else {
                 boards[11] = swapBit(boards[11], move.initialIndex - 4, move.targetIndex + 1)
             }
         }
+    }
+
+    fun getPieceAt(pieceIndex: Int, whiteTurn: Boolean): EPieceType? {
+        val pieceBit = flipBit(empty, pieceIndex)
+
+        for (i in boards.indices) {
+            if ((pieceBit and boards[i]).countOneBits() >= 1) {
+                if(isWhite(EPieceType.fromInt(i)!!) == whiteTurn)
+                return EPieceType.fromInt(i)
+            }
+        }
+        return null
     }
 
     fun getPieceAt(pieceIndex: Int): EPieceType? {
@@ -144,20 +152,20 @@ class BoardStateManager() {
 
     fun getPieceBoard(piece: EPieceType): ULong {
         if (piece.ordinal !in boards.indices) {
-            throw IllegalStateException("Piece $piece was not found in Board Set!")
+            throw IllegalStateException("$piece was not found in Board Set!")
         }
 
         return boards[piece.ordinal]
     }
 
-    fun getEnemyBoard(wPlayer: Boolean): ULong {
+    fun getEnemyBoard(white: Boolean): ULong {
         var enemyBoard: ULong = empty
-        if (wPlayer) {
-            for (i in 6..11) {
+        if (white) {
+            for (i in 0..5) {
                 enemyBoard = enemyBoard xor getPieceBoard(EPieceType.fromInt(i)!!)
             }
         } else {
-            for (i in 0..5) {
+            for (i in 6..11) {
                 enemyBoard = enemyBoard xor getPieceBoard(EPieceType.fromInt(i)!!)
             }
         }
