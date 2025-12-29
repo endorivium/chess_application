@@ -3,10 +3,10 @@ package chess.utils
 import java.lang.Character.toChars
 
 fun toAlgebraic(index: Int): String {
-    val file = index % 8 + 97
+    val file = index % 8 + 65
     val rank = index / 8 + 49
 
-    if(file !in 97..104 || rank !in 49..56){
+    if(file !in 65..72 || rank !in 49..56){
         throw IllegalArgumentException("Index is not within range cannot be converted to Algebraic Notation")
     }
 
@@ -17,11 +17,12 @@ fun toAlgebraic(index: Int): String {
 }
 
 fun toIndex(algebraic: String): Int{
-    if(algebraic.length != 2){
+    val normed = algebraic.lowercase()
+    if(normed.length != 2){
         throw IllegalArgumentException("Length of string parameter must be 2")
     }
-    val file = algebraic[0].code - 97
-    val rank = algebraic[1].code - 49
+    val file = normed[0].code - 97
+    val rank = normed[1].code - 49
     return rank * 8 + file
 }
 

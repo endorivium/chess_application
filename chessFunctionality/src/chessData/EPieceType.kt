@@ -1,4 +1,4 @@
-package gamePieces
+package chessData
 
 enum class EPieceType {
     WBishop,

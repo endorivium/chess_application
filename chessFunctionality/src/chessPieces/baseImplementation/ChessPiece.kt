@@ -1,11 +1,14 @@
-package gamePieces
+package chessPieces.baseImplementation
 
 import chess.utils.empty
 import chess.utils.flipBit
 import chess.utils.isWithinBoard
 import chess.utils.willFileOverflow
-import gameState.ChessMove
-import gameState.GameManager
+import chessData.EMoveType
+import chessData.EPieceType
+import chessData.MoveSet
+import chessData.ChessMove
+import chessStateManager.GameManager
 
 open class ChessPiece(
     val gm: GameManager,
@@ -21,16 +24,16 @@ open class ChessPiece(
     returns possible moves for given chess piece
     first ULong is normal movement, second is attack
     */
-    open fun getPossibleMoves(posIndex: Int): MoveSet {
-        return MoveSet(findMoves(posIndex), findAttacks(posIndex))
+    open fun getPossibleMoves(index: Int): MoveSet {
+        return MoveSet(findMoves(index), findAttacks(index))
     }
 
-    open fun findMoves(posIndex: Int): ULong{
+    open fun findMoves(index: Int): ULong{
         var moves = empty
-        val board = gm.bSManager.getBoardState()
+        val board = gm.bsm.getBoardState()
 
         for(step in movePattern) {
-            var next = posIndex
+            var next = index
             var move: ULong
             while (isWithinBoard(next + step)) {
                 //fixes file overflow
@@ -49,12 +52,12 @@ open class ChessPiece(
         return moves
     }
 
-    open fun findAttacks(posIndex: Int): ULong{
+    open fun findAttacks(index: Int): ULong{
         var attacks = empty
-        val board = gm.bSManager.getBoardState()
+        val board = gm.bsm.getBoardState()
 
         for(step in movePattern){
-            var next = posIndex
+            var next = index
             var attack: ULong
             while(isWithinBoard(next + step)){
                 //fixes file overflow
@@ -66,7 +69,7 @@ open class ChessPiece(
                 attack = flipBit(empty, next)
                 attack = attack and board
                 if(attack.countOneBits() != 0
-                    && isEnemy(gm.bSManager.getPieceAt(next)!!)) {
+                    && isEnemy(gm.bsm.getPieceAt(next)!!)) {
                     attacks = attacks xor attack
                     break
                 }
@@ -79,12 +82,16 @@ open class ChessPiece(
         val possibleMoves = getPossibleMoves(move.initialIndex)
         val desiredMove = flipBit(empty, move.targetIndex)
 
-        if((possibleMoves.movement and desiredMove).countOneBits() >= 1){
+        if((possibleMoves.move and desiredMove).countOneBits() >= 1){
             return Pair(true, EMoveType.Push)
         }
 
         if((possibleMoves.attack and desiredMove).countOneBits() >= 1){
             return Pair(true, EMoveType.Attack)
+        }
+
+        if((possibleMoves.rochade and desiredMove).countOneBits() >= 1){
+            return Pair(true, EMoveType.Rochade)
         }
 
         return Pair(false, null)

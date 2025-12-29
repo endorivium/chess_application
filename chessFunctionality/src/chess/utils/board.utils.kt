@@ -1,6 +1,6 @@
 package chess.utils
 
-import gamePieces.EPieceType
+import chessData.EPieceType
 import kotlin.code
 
 val omniDirectional = arrayOf(7, 8, 9, -1, 1, -9, -8, -7)

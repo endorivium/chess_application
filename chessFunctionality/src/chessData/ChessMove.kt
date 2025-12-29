@@ -1,10 +1,7 @@
-package gameState
+package chessData
 
 import chess.utils.toIndex
-import gamePieces.EPieceType
-
-//TODO: add color and piece type
-//TODO: initialize indices
+import chessData.EPieceType
 
 /*
 chessPiece should only be used to record chess moves
