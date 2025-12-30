@@ -13,8 +13,10 @@ data class ChessMove(
     var targetIndex: Int = -1,
     var chessPiece: EPieceType? = null) {
     init{
-        if(!initialCoord.isEmpty() && !targetCoord.isEmpty()) {
+        if(!initialCoord.isEmpty()) {
             initialIndex = toIndex(initialCoord)
+        }
+        if(!targetCoord.isEmpty()){
             targetIndex = toIndex(targetCoord)
         }
     }

@@ -1,10 +1,12 @@
-package chessPieces.baseImplementation
+package chessPieceImplementation.baseImplementation
 
 import chess.utils.empty
 import chess.utils.flipBit
+import chess.utils.isWhite
+import chess.utils.isWithinBoard
 import chess.utils.willFileOverflow
 import chessData.EPieceType
-import chessStateManager.GameManager
+import chessStateManagement.GameManager
 
 open class SingleStep(
     gm: GameManager,
@@ -15,11 +17,11 @@ open class SingleStep(
 
     override fun findMoves(index: Int): ULong {
         var moves = empty
-        val board = gm.bsm.getBoardState()
+        val board = gm.getBSM().getBoardState()
 
         for (step in movePattern) {
-            //fixes file overflow
-            if (willFileOverflow(index, index + step))
+            if (willFileOverflow(index, index + step)
+                || !isWithinBoard(index + step))
                 continue
 
             val move: ULong = flipBit(empty, index + step)
@@ -34,18 +36,21 @@ open class SingleStep(
 
     override fun findAttacks(index: Int): ULong {
         var attacks = empty
-        val board = gm.bsm.getBoardState()
+        val enemyBoard = gm.getBSM().getColorBoard(!isWhite(piece))
+        val allyBoard = gm.getBSM().getColorBoard(isWhite(piece))
 
         for (step in movePattern) {
-            //fixes file overflow
-            if (willFileOverflow(index, index + step))
+            if (willFileOverflow(index, index + step)
+                || !isWithinBoard(index + step))
                 continue
 
-            var attack: ULong = flipBit(empty, index)
-            attack = attack and board
-            if (attack.countOneBits() != 0
-                && isEnemy(gm.bsm.getPieceAt(index)!!)
-            ) {
+            var attack = flipBit(empty, index + step)
+            val ally = attack and allyBoard
+            if(ally.countOneBits() != 0)
+                continue
+
+            attack = attack and enemyBoard
+            if(attack.countOneBits() != 0) {
                 attacks = attacks xor attack
             }
         }

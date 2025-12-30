@@ -1,4 +1,4 @@
-package chessPieces
+package chessPieceImplementation
 
 import chess.utils.empty
 import chess.utils.flipBit
@@ -6,14 +6,17 @@ import chess.utils.isWhite
 import chess.utils.omniDirectional
 import chessData.EPieceType
 import chessData.MoveSet
-import chessPieces.baseImplementation.SingleStep
-import chessStateManager.GameManager
+import chessPieceImplementation.baseImplementation.SingleStep
+import chessStateManagement.GameManager
 
 class King(gm: GameManager, piece: EPieceType) : SingleStep(gm, piece, omniDirectional) {
 
     override fun getPossibleMoves(index: Int): MoveSet {
         val moves = super.getPossibleMoves(index)
-        //TODO: add rochade here
+
+        if(piece == EPieceType.BKing && gm.getBSM().bKingMoved) return moves
+        if(piece == EPieceType.WKing && gm.getBSM().wKingMoved) return moves
+
         moves.rochade = rochadeMove(index)
         return moves
     }
@@ -24,14 +27,14 @@ class King(gm: GameManager, piece: EPieceType) : SingleStep(gm, piece, omniDirec
 
     fun shortRochade(index: Int): ULong {
         //check king and right rook not moved
-        val kingRooksMoved = gm.bsm.haveKingRooksMoved(isWhite(piece))
+        val kingRooksMoved = gm.getBSM().haveKingRooksMoved(isWhite(piece))
         if(kingRooksMoved.first || kingRooksMoved.third) return empty
 
         //check space between king and rook empty
-        if(!gm.bsm.areSquaresUnoccupied(arrayOf(index + 1, index + 2))) return empty
+        if(gm.getBSM().areSquaresOccupied(arrayOf(index + 1, index + 2))) return empty
 
         //check king space and spaces between unthreatened
-        if(gm.bsm.areSquaresThreatened(arrayOf(index, index + 1, index + 2),
+        if(gm.getBSM().areSquaresThreatened(arrayOf(index, index + 1, index + 2),
                 isWhite(piece))) return empty
 
         return flipBit(empty, index + 2)
@@ -39,14 +42,14 @@ class King(gm: GameManager, piece: EPieceType) : SingleStep(gm, piece, omniDirec
 
     fun longRochade(index: Int): ULong {
         //check king and right rook not moved
-        val kingRooksMoved = gm.bsm.haveKingRooksMoved(isWhite(piece))
+        val kingRooksMoved = gm.getBSM().haveKingRooksMoved(isWhite(piece))
         if(kingRooksMoved.first || kingRooksMoved.second) return empty
 
         //check space between king and rook empty
-        if(!gm.bsm.areSquaresUnoccupied(arrayOf(index - 1, index - 2, index - 3))) return empty
+        if(gm.getBSM().areSquaresOccupied(arrayOf(index - 1, index - 2, index - 3))) return empty
 
         //check king space and spaces between unthreatened
-        if(gm.bsm.areSquaresThreatened(arrayOf(index - 1, index - 2, index - 3),
+        if(gm.getBSM().areSquaresThreatened(arrayOf(index - 1, index - 2, index - 3),
                 isWhite(piece))) return empty
 
         return flipBit(empty, index - 2)

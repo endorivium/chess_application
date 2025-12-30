@@ -2,6 +2,8 @@ package chess.utils
 
 import chessData.EPieceType
 import kotlin.code
+import kotlin.math.abs
+import kotlin.math.ceil
 
 val omniDirectional = arrayOf(7, 8, 9, -1, 1, -9, -8, -7)
 val omniDiagonal = arrayOf(7, 9, -7, -9)
@@ -9,7 +11,7 @@ val knightPattern = arrayOf(6, 15, 17, 10, -10, -17, -15, -6)
 val cardinal = arrayOf(1, 8, -1, -8)
 
 fun isWithinRanks(index: Int, lowerRank: Int, upperRank: Int): Boolean {
-    return index/8 in lowerRank..upperRank
+    return (index/8 + 1) in lowerRank..upperRank
 }
 
 fun isWithinBoard(index: Int): Boolean {
@@ -42,6 +44,9 @@ fun isWhite(piece: EPieceType): Boolean {
 }
 
 fun willFileOverflow(current: Int, next: Int): Boolean {
-    return isFile('A', current) && isFile('H', next)
-        || isFile('H', current) && isFile('A', next)
+    val currFile = current%8
+    val nextFile = next%8
+    val dist = abs(currFile - nextFile)
+
+     return dist > 2
 }

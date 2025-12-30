@@ -1,8 +1,8 @@
-package chessPieces
+package chessPieceImplementation
 
 import chess.utils.knightPattern
 import chessData.EPieceType
-import chessPieces.baseImplementation.SingleStep
-import chessStateManager.GameManager
+import chessPieceImplementation.baseImplementation.SingleStep
+import chessStateManagement.GameManager
 
 class Knight(gm: GameManager, piece: EPieceType) : SingleStep(gm, piece, knightPattern)

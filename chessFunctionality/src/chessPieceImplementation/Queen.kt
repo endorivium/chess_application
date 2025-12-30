@@ -1,8 +1,8 @@
-package chessPieces
+package chessPieceImplementation
 
 import chess.utils.omniDirectional
 import chessData.EPieceType
-import chessPieces.baseImplementation.ChessPiece
-import chessStateManager.GameManager
+import chessPieceImplementation.baseImplementation.ChessPiece
+import chessStateManagement.GameManager
 
 class Queen(gm: GameManager, piece: EPieceType) : ChessPiece(gm, piece, omniDirectional)

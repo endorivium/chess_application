@@ -1,9 +1,6 @@
-import chess.utils.printBitDebug
-import chessStateManager.GameManager
-import java.lang.Character.toChars
+import chessStateManagement.GameManager
 
 val gameManager: GameManager = GameManager()
 fun main() {
-    gameManager.initializeGame()
     gameManager.startGameLoop()
 }

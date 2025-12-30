@@ -2,7 +2,10 @@ package boardRendering
 
 import chess.utils.getBit
 import chess.utils.getBoardIndices
-import chessStateManager.GameManager
+import chess.utils.isWhite
+import chess.utils.toAlgebraic
+import chessData.EPieceType
+import chessStateManagement.GameManager
 
 class BoardRenderer(val gm: GameManager) {
     val pieceIcons = arrayOf(
@@ -23,7 +26,7 @@ class BoardRenderer(val gm: GameManager) {
     )
     val file = " \uFFE3   [\uFF21][\uFF22][\uFF23][\uFF24][\uFF25][\uFF26][\uFF27][\uFF28]"
 
-    fun renderBoard(whiteTurn: Boolean) {
+    fun renderBoard(whiteTurn: Boolean, check: Boolean, checkMate: Boolean) {
         val boardRender = refreshRendering()
 
         print("\n")
@@ -40,13 +43,21 @@ class BoardRenderer(val gm: GameManager) {
             rankIndex++
         }
         println("\n" + file)
-        println("\n")
+        if(checkMate){
+            printCheckMate(whiteTurn)
+            println("\n")
+            return
+        }
+        if(check) {
+            printCheck()
+        }
 
+        println("\n")
     }
 
     fun refreshRendering(): Array<String> {
-        val board = gm.bsm.getBoardState()
-        val pieceBoards = gm.bsm.getPieceBoards()
+        val board = gm.getBSM().getBoardState()
+        val pieceBoards = gm.getBSM().getPieceBoards()
         val indices = getBoardIndices(board)
         val pieceRender = Array(64) { noPiece }
 
@@ -71,5 +82,45 @@ class BoardRenderer(val gm: GameManager) {
         }
         return rankRender
     }
-}
 
+    fun printCheck(){
+        print("\n    \uFF1D\uFF1D  " +
+                "\uFF2B\uFF29\uFF2E\uFF27 \uFF29\uFF2E \uFF23\uFF28\uFF25\uFF23\uFF2B\uFF01"+
+                "  \uFF1D\uFF1D ")
+    }
+
+    fun printCheckMate(whiteTurn: Boolean) {
+        print("\n      \uFF1D\uFF1D  " +
+                "\uFF23\uFF28\uFF25\uFF23\uFF2B\uFF2D\uFF21\uFF34\uFF25\uFF01"+
+                "  \uFF1D\uFF1D ")
+        if(!whiteTurn){
+            print("\n      \uFF1D\uFF1D  " +
+                    "\uFF37\uFF28\uFF29\uFF34\uFF25 \uFF37\uFF29\uFF2E\uFF33\uFF01"+
+                    "  \uFF1D\uFF1D ")
+        } else {
+            print("\n      \uFF1D\uFF1D  " +
+                    "\uFF22\uFF2C\uFF21\uFF23\uFF2B \uFF37\uFF29\uFF2E\uFF33\uFF01"+
+                    "  \uFF1D\uFF1D ")
+        }
+    }
+
+    fun printPossibleMoves(chessPiece: EPieceType, index: Int, squares: MutableList<Int>, whiteTurn: Boolean) {
+        if(squares.isEmpty()) {
+            if(isWhite(chessPiece) == !whiteTurn) {
+                println("You cannot check moves of chess pieces that belong to the opposite color!")
+            } else {
+                println(
+                    "There are no available moves for " +
+                            chessPiece.toString() + " at " + toAlgebraic(index)
+                )
+            }
+            return
+        }
+
+        println(chessPiece.toString() + " at " + toAlgebraic(index) + " can move to the following: ")
+        for(i in squares.indices){
+            print("-> " + toAlgebraic(squares[i]) + "\n")
+        }
+        print("\n")
+    }
+}

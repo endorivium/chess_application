@@ -1,14 +1,15 @@
-package chessPieces.baseImplementation
+package chessPieceImplementation.baseImplementation
 
 import chess.utils.empty
 import chess.utils.flipBit
+import chess.utils.isWhite
 import chess.utils.isWithinBoard
 import chess.utils.willFileOverflow
 import chessData.EMoveType
 import chessData.EPieceType
 import chessData.MoveSet
 import chessData.ChessMove
-import chessStateManager.GameManager
+import chessStateManagement.GameManager
 
 open class ChessPiece(
     val gm: GameManager,
@@ -30,7 +31,7 @@ open class ChessPiece(
 
     open fun findMoves(index: Int): ULong{
         var moves = empty
-        val board = gm.bsm.getBoardState()
+        val board = gm.getBSM().getBoardState()
 
         for(step in movePattern) {
             var next = index
@@ -54,11 +55,13 @@ open class ChessPiece(
 
     open fun findAttacks(index: Int): ULong{
         var attacks = empty
-        val board = gm.bsm.getBoardState()
+        val enemyBoard = gm.getBSM().getColorBoard(!isWhite(piece))
+        val allyBoard = gm.getBSM().getColorBoard(isWhite(piece))
 
         for(step in movePattern){
             var next = index
             var attack: ULong
+            var ally: ULong
             while(isWithinBoard(next + step)){
                 //fixes file overflow
                 if(willFileOverflow(next, next + step))
@@ -67,9 +70,12 @@ open class ChessPiece(
                 next += step
 
                 attack = flipBit(empty, next)
-                attack = attack and board
-                if(attack.countOneBits() != 0
-                    && isEnemy(gm.bsm.getPieceAt(next)!!)) {
+                ally = attack and allyBoard
+                if(ally.countOneBits() != 0)
+                    break
+
+                attack = attack and enemyBoard
+                if(attack.countOneBits() != 0) {
                     attacks = attacks xor attack
                     break
                 }
