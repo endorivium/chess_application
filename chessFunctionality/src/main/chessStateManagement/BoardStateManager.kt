@@ -1,18 +1,18 @@
-package chessStateManagement
+package main.chessStateManagement
 
-import chess.utils.empty
-import chess.utils.flipBit
-import chess.utils.flipBits
-import chess.utils.getBoardIndices
-import chess.utils.isWhite
-import chess.utils.isWithinBoard
-import chess.utils.knightPattern
-import chess.utils.omniDirectional
-import chess.utils.swapBit
-import chess.utils.willFileOverflow
-import chessData.ChessMove
-import chessData.EMoveType
-import chessData.EPieceType
+import main.utils.empty
+import main.utils.flipBit
+import main.utils.flipBits
+import main.utils.getBoardIndices
+import main.utils.isWhite
+import main.utils.isWithinBoard
+import main.utils.knightPattern
+import main.utils.omniDirectional
+import main.utils.swapBit
+import main.utils.willFileOverflow
+import main.chessData.ChessMove
+import main.chessData.EMoveType
+import main.chessData.EPieceType
 
 
 class BoardStateManager(

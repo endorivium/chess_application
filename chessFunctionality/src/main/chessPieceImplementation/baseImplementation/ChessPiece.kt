@@ -1,15 +1,15 @@
-package chessPieceImplementation.baseImplementation
+package main.chessPieceImplementation.baseImplementation
 
-import chess.utils.empty
-import chess.utils.flipBit
-import chess.utils.isWhite
-import chess.utils.isWithinBoard
-import chess.utils.willFileOverflow
-import chessData.EMoveType
-import chessData.EPieceType
-import chessData.MoveSet
-import chessData.ChessMove
-import chessStateManagement.GameManager
+import main.utils.empty
+import main.utils.flipBit
+import main.utils.isWhite
+import main.utils.isWithinBoard
+import main.utils.willFileOverflow
+import main.chessData.EMoveType
+import main.chessData.EPieceType
+import main.chessData.MoveSet
+import main.chessData.ChessMove
+import main.chessStateManagement.GameManager
 
 open class ChessPiece(
     val gm: GameManager,

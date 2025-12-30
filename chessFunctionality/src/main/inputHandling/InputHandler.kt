@@ -1,7 +1,7 @@
-package inputHandling
+package main.inputHandling
 
-import chess.utils.isInAlgebraicNotation
-import chessData.ChessMove
+import main.utils.isInAlgebraicNotation
+import main.chessData.ChessMove
 import java.util.Locale.getDefault
 import kotlin.system.exitProcess
 

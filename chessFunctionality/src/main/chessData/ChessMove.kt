@@ -1,7 +1,6 @@
-package chessData
+package main.chessData
 
-import chess.utils.toIndex
-import chessData.EPieceType
+import main.utils.toIndex
 
 /*
 chessPiece should only be used to record chess moves

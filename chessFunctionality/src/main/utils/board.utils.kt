@@ -1,9 +1,8 @@
-package chess.utils
+package main.utils
 
-import chessData.EPieceType
+import main.chessData.EPieceType
 import kotlin.code
 import kotlin.math.abs
-import kotlin.math.ceil
 
 val omniDirectional = arrayOf(7, 8, 9, -1, 1, -9, -8, -7)
 val omniDiagonal = arrayOf(7, 9, -7, -9)

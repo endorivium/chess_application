@@ -1,15 +1,15 @@
-package chessPieceImplementation
+package main.chessPieceImplementation
 
-import chess.utils.empty
-import chess.utils.flipBit
-import chess.utils.isFile
-import chess.utils.isWhite
-import chess.utils.isWithinRanks
-import chessPieceImplementation.baseImplementation.ChessPiece
-import chessData.ChessMove
-import chessData.EPieceType
-import chessData.MoveSet
-import chessStateManagement.GameManager
+import main.utils.empty
+import main.utils.flipBit
+import main.utils.isFile
+import main.utils.isWhite
+import main.utils.isWithinRanks
+import main.chessPieceImplementation.baseImplementation.ChessPiece
+import main.chessData.ChessMove
+import main.chessData.EPieceType
+import main.chessData.MoveSet
+import main.chessStateManagement.GameManager
 import kotlin.math.abs
 
 class Pawn(gm: GameManager, piece: EPieceType): ChessPiece(gm, piece = piece) {

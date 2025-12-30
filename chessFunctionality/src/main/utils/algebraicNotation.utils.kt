@@ -1,4 +1,4 @@
-package chess.utils
+package main.utils
 
 import java.lang.Character.toChars
 

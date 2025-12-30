@@ -1,12 +1,12 @@
-package chessPieceImplementation.baseImplementation
+package main.chessPieceImplementation.baseImplementation
 
-import chess.utils.empty
-import chess.utils.flipBit
-import chess.utils.isWhite
-import chess.utils.isWithinBoard
-import chess.utils.willFileOverflow
-import chessData.EPieceType
-import chessStateManagement.GameManager
+import main.utils.empty
+import main.utils.flipBit
+import main.utils.isWhite
+import main.utils.isWithinBoard
+import main.utils.willFileOverflow
+import main.chessData.EPieceType
+import main.chessStateManagement.GameManager
 
 open class SingleStep(
     gm: GameManager,
