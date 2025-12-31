@@ -13,21 +13,19 @@ class GameManager(
     var inputHandler: InputHandler = InputHandler(),
     val moveHistory: MutableList<ChessMove> = mutableListOf()
 ) {
-    //TODO: init game (possibly from save file)
-
     private lateinit var bsm: BoardStateManager
     private lateinit var ruleBook: RuleBook
     private lateinit var renderer: BoardRenderer
 
-    var whiteTurn = true
-    var gameEnded = false
+    private var whiteTurn = true
+    private var gameEnded = false
 
-    fun initializeGame() {
+    private fun initializeGame() {
         inputHandler.initialize()
         bsm = BoardStateManager(this)
         bsm.initialize()
         ruleBook = RuleBook(this)
-        renderer = BoardRenderer(this)
+        renderer = BoardRenderer(bsm)
         whiteTurn = true
         gameEnded = false
     }
@@ -39,10 +37,10 @@ class GameManager(
         while (!gameEnded) {
             playerMove = inputHandler.readInput()
 
-            if(playerMove.first == EOutputType.Move) handleMove(playerMove.second)
-            if(playerMove.first == EOutputType.MoveCheck) handleMoveInquiry(playerMove.second)
-            if(playerMove.first == EOutputType.Demo) handleAutomatedMove(playerMove.second)
-            if(playerMove.first == EOutputType.Reset) startGameLoop()
+            if (playerMove.first == EOutputType.Move) handleMove(playerMove.second)
+            if (playerMove.first == EOutputType.MoveCheck) handleMoveInquiry(playerMove.second)
+            if (playerMove.first == EOutputType.Demo) handleAutomatedMove(playerMove.second)
+            if (playerMove.first == EOutputType.Reset) startGameLoop()
 
             val check = bsm.isCheck(whiteTurn)
             val checkMate = bsm.isCheckMate(whiteTurn)
@@ -57,32 +55,35 @@ class GameManager(
     }
 
 
-
-    fun handleAutomatedMove(playerMove: ChessMove?) {
-        if(playerMove == null) return
+    private fun handleAutomatedMove(playerMove: ChessMove?) {
+        if (playerMove == null) return
         handleMove(playerMove)
     }
 
-    fun handleMoveInquiry(playerMove: ChessMove?) {
+    private fun handleMoveInquiry(playerMove: ChessMove?) {
         if (playerMove == null) {
-            println("Error! Inquiry was not valid! Was it in algebraic notation " +
-                    "(type 'AN' for info) and is there a chess piece on that square?")
+            println(
+                "Error! Inquiry was not valid! Was it in algebraic notation " +
+                        "(type 'AN' for info) and is there a chess piece on that square?"
+            )
             return
         }
 
         val squares = bsm.findPossibleMoves(playerMove, whiteTurn)
         val chessPiece = bsm.getPieceAt(playerMove.initialIndex)
 
-        if(chessPiece == null) {
-            println("Error! There is either no chess piece at " +
-                    "${toAlgebraic(playerMove.initialIndex)} or it is not one of yours!")
+        if (chessPiece == null) {
+            println(
+                "Error! There is either no chess piece at " +
+                        "${toAlgebraic(playerMove.initialIndex)} or it is not one of yours!"
+            )
             return
         }
 
         renderer.printPossibleMoves(chessPiece, playerMove.initialIndex, squares.second, whiteTurn)
     }
 
-    fun handleMove(playerMove: ChessMove?) {
+    private fun handleMove(playerMove: ChessMove?) {
         if (playerMove == null) {
             println("Command could not be executed.")
             return

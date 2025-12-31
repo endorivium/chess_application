@@ -5,9 +5,10 @@ import utils.getBoardIndices
 import utils.isWhite
 import utils.toAlgebraic
 import chessData.EPieceType
+import chessStateManagement.BoardStateManager
 import chessStateManagement.GameManager
 
-class BoardRenderer(val gm: GameManager) {
+class BoardRenderer(val bsm: BoardStateManager) {
     val pieceIcons = arrayOf(
         "[\u265D]", "[\u265A]", "[\u265E]", "[\u265F]", "[\u265B]", "[\u265C]",
         "[\u2657]", "[\u2654]", "[\u2658]", "[\u2659]", "[\u2655]", "[\u2656]"
@@ -56,8 +57,8 @@ class BoardRenderer(val gm: GameManager) {
     }
 
     fun refreshRendering(): Array<String> {
-        val board = gm.getBSM().getBoardState()
-        val pieceBoards = gm.getBSM().getPieceBoards()
+        val board = bsm.getBoardState()
+        val pieceBoards = bsm.getPieceBoards()
         val indices = getBoardIndices(board)
         val pieceRender = Array(64) { noPiece }
 

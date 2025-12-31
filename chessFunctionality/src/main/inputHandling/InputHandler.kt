@@ -6,20 +6,19 @@ import java.util.Locale.getDefault
 import kotlin.system.exitProcess
 
 class InputHandler(
-    val keywords: Array<String> = arrayOf("help", "check", "an", "quit", "move", "demo", "demos", "reset"),
-    val automatedGame: Array<Array<String>> =
-        arrayOf(
-            arrayOf("f2f3", "e7e6", "g2g4", "d8h4"),
-            arrayOf("e2e3", "f7f6", "g1h3", "g7g5", "d1h5"),
-            arrayOf("e2e3", "b8a6", "a2a3", "d7d6", "b2b3", "c8e6", "c2c3", "d8d7", "d2d3", "e8c8"),
-            arrayOf("g2g3", "a7a6", "f1h3", "b7b6", "g1f3", "c7c6", "e1g1"),
-            arrayOf("d2d4", "a7a6", "d4d5", "c7c5", "d5c5")
-        )
+    private val keywords: Array<String> = arrayOf("help", "check", "an", "quit", "move", "demo", "demos", "reset"),
+    private val automatedGame: Array<Array<String>> = arrayOf(
+        arrayOf("f2f3", "e7e6", "g2g4", "d8h4"),
+        arrayOf("e2e3", "f7f6", "g1h3", "g7g5", "d1h5"),
+        arrayOf("e2e3", "b8a6", "a2a3", "d7d6", "b2b3", "c8e6", "c2c3", "d8d7", "d2d3", "e8c8"),
+        arrayOf("g2g3", "a7a6", "f1h3", "b7b6", "g1f3", "c7c6", "e1g1"),
+        arrayOf("d2d4", "a7a6", "d4d5", "c7c5", "d5c5")
+    )
 ) {
     //region AutomatedGame
-    var automated = false
-    var gameStep = 0
-    var gameIndex: Int? = 0
+    private var automated = false
+    private var gameStep = 0
+    private var gameIndex: Int? = 0
     //endregion
 
     fun initialize() {
@@ -39,7 +38,7 @@ class InputHandler(
     }
 
     //handles the help cmd by printing out a list of all possible game commands
-    fun handleHelpCmd(): EOutputType {
+    private fun handleHelpCmd(): EOutputType {
         println(
             "Commands are not case sensitive. All move commands must be written in algebraic notation.\n" +
                     "> help: get a list of all available commands that allow interaction with the game\n" +
@@ -53,7 +52,7 @@ class InputHandler(
         return EOutputType.None
     }
 
-    fun handleDemosCmd(): EOutputType {
+    private fun handleDemosCmd(): EOutputType {
         println(
             "The following chess demos are preprogrammed and can be run through via the 'auto' command.\n" +
                     "> 0: Fool's Mate. Checkmate in four moves. Black wins.\n" +
@@ -61,12 +60,11 @@ class InputHandler(
                     "> 2: Black King Long Rochade\n" +
                     "> 3: White King Short Rochade" +
                     "> 4: Pawn en Passant"
-                    //"> 3: Chess Piece Demo. All pieces move and attack."
         )
         return EOutputType.None
     }
 
-    fun handleCheckCmd(input: String): ChessMove? {
+    private fun handleCheckCmd(input: String): ChessMove? {
         val cleanedString = cleanString(keywords[1], input)
 
         if (cleanedString.length == 2
@@ -77,7 +75,7 @@ class InputHandler(
         return null
     }
 
-    fun handleAlgebraicNotationCmd(): EOutputType {
+    private fun handleAlgebraicNotationCmd(): EOutputType {
         println(
             "Algebraic notation is the standard method of chess notation to record and describe moves. It consists of two characters.\n" +
                     "The first character (a -> h) describes the columns of a chessboard from left to right.\n" +
@@ -87,7 +85,7 @@ class InputHandler(
         return EOutputType.None
     }
 
-    fun handleMoveCmd(input: String): ChessMove? {
+    private fun handleMoveCmd(input: String): ChessMove? {
         val moveCoord = extractMove(input)
 
         if (moveCoord.first) {
@@ -98,7 +96,7 @@ class InputHandler(
         return null
     }
 
-    fun handleDemoCmd(input: String): ChessMove? {
+    private fun handleDemoCmd(input: String): ChessMove? {
         val cleanedString = cleanString(keywords[5], input)
         gameIndex = cleanedString.toIntOrNull()
         if (gameIndex == null || gameIndex!! > automatedGame.lastIndex) {
@@ -135,7 +133,7 @@ class InputHandler(
         return input.length == 4
     }
 
-    fun handleInput(input: String): Pair<EOutputType, ChessMove?> {
+    private fun handleInput(input: String): Pair<EOutputType, ChessMove?> {
         val normedInput = input.lowercase(getDefault())
 
         val keyword = extractKeyword(normedInput)
@@ -160,12 +158,8 @@ class InputHandler(
         print("> ")
         val input = readln()
         when (input) {
-            "reset" -> {
-                return EOutputType.Reset
-            }
-            "quit" -> {
-                exitProcess(0)
-            }
+            "reset" -> return EOutputType.Reset
+            "quit" -> exitProcess(0)
             else -> {
                 println("Input was not valid.")
                 playAgain()

@@ -9,13 +9,14 @@ import chessData.EMoveType
 import chessData.EPieceType
 import chessData.MoveSet
 import chessData.ChessMove
+import chessStateManagement.BoardStateManager
 import chessStateManagement.GameManager
 
 open class ChessPiece(
-    val gm: GameManager,
+    val bsm: BoardStateManager,
     val piece: EPieceType = EPieceType.WPawn,
     val movePattern: Array<Int> = emptyArray(),
-    var mod: Int = 0){
+    protected var mod: Int = 0){
 
     init{
         mod = if(piece.ordinal in 0..5) 1 else -1
@@ -31,7 +32,7 @@ open class ChessPiece(
 
     open fun findMoves(index: Int): ULong{
         var moves = empty
-        val board = gm.getBSM().getBoardState()
+        val board = bsm.getBoardState()
 
         for(step in movePattern) {
             var next = index
@@ -55,8 +56,8 @@ open class ChessPiece(
 
     open fun findAttacks(index: Int): ULong{
         var attacks = empty
-        val enemyBoard = gm.getBSM().getColorBoard(!isWhite(piece))
-        val allyBoard = gm.getBSM().getColorBoard(isWhite(piece))
+        val enemyBoard = bsm.getColorBoard(!isWhite(piece))
+        val allyBoard = bsm.getColorBoard(isWhite(piece))
 
         for(step in movePattern){
             var next = index
@@ -101,9 +102,5 @@ open class ChessPiece(
         }
 
         return Pair(false, null)
-    }
-
-    fun isEnemy(other: EPieceType): Boolean {
-        return piece.ordinal in 0..5 && other.ordinal !in 0..5
     }
 }

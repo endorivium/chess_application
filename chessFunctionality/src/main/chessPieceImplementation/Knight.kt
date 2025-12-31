@@ -3,6 +3,6 @@ package chessPieceImplementation
 import utils.knightPattern
 import chessData.EPieceType
 import chessPieceImplementation.baseImplementation.SingleStep
-import chessStateManagement.GameManager
+import chessStateManagement.BoardStateManager
 
-class Knight(gm: GameManager, piece: EPieceType) : SingleStep(gm, piece, knightPattern)
+class Knight(bsm: BoardStateManager, piece: EPieceType) : SingleStep(bsm, piece, knightPattern)

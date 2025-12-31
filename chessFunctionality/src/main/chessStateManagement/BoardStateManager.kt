@@ -15,8 +15,8 @@ import chessData.EMoveType
 import chessData.EPieceType
 
 
-class BoardStateManager(
-    val gm: GameManager
+open class BoardStateManager(
+    private val gm: GameManager
 ) {
     //region GameStateVariables
     var wKingMoved = false
@@ -29,24 +29,24 @@ class BoardStateManager(
     //endregion
 
     //region BlackBoard
-    var wBishopBoard: ULong = 0x2400000000000000u
-    var wKingBoard: ULong = 0x800000000000000u
-    var wKnightBoard: ULong = 0x4200000000000000u
-    var wPawnBoard: ULong = 0xFF000000000000u
-    var wQueenBoard: ULong = 0x1000000000000000u
-    var wRookBoard: ULong = 0x8100000000000000u
+    private var wBishopBoard: ULong = 0x2400000000000000u
+    private var wKingBoard: ULong = 0x800000000000000u
+    private var wKnightBoard: ULong = 0x4200000000000000u
+    private var wPawnBoard: ULong = 0xFF000000000000u
+    private var wQueenBoard: ULong = 0x1000000000000000u
+    private var wRookBoard: ULong = 0x8100000000000000u
     //endregion
 
     //region WhiteBoard
-    var bBishopBoard: ULong = 0x24u
-    var bKingBoard: ULong = 0x8u
-    var bKnightBoard: ULong = 0x42u
-    var bPawnBoard: ULong = 0xFF00u
-    var bQueenBoard: ULong = 0x10u
-    var bRookBoard: ULong = 0x81u
+    private var bBishopBoard: ULong = 0x24u
+    private var bKingBoard: ULong = 0x8u
+    private var bKnightBoard: ULong = 0x42u
+    private var bPawnBoard: ULong = 0xFF00u
+    private var bQueenBoard: ULong = 0x10u
+    private var bRookBoard: ULong = 0x81u
     //endregion
 
-    var boards = arrayOf(
+    private var boards = arrayOf(
         wBishopBoard,
         wKingBoard,
         wKnightBoard,
@@ -115,11 +115,11 @@ class BoardStateManager(
         return false
     }
 
-    fun execPush(piece: EPieceType, move: ChessMove) {
+    private fun execPush(piece: EPieceType, move: ChessMove) {
         boards[piece.ordinal] = swapBit(boards[piece.ordinal], move.initialIndex, move.targetIndex)
     }
 
-    fun execAttack(piece: EPieceType, move: ChessMove, whiteTurn: Boolean) {
+    private fun execAttack(piece: EPieceType, move: ChessMove, whiteTurn: Boolean) {
         val enemy = getPieceAt(move.targetIndex, !whiteTurn)
             ?: throw IllegalStateException("There was no enemy to attack at " + move.targetIndex)
 
@@ -127,7 +127,7 @@ class BoardStateManager(
         boards[enemy.ordinal] = flipBit(boards[enemy.ordinal], move.targetIndex)
     }
 
-    fun execRochade(piece: EPieceType, move: ChessMove) {
+    private fun execRochade(piece: EPieceType, move: ChessMove) {
         boards[piece.ordinal] = swapBit(boards[piece.ordinal], move.initialIndex, move.targetIndex)
 
         //short rochade (moving right)
@@ -208,6 +208,7 @@ class BoardStateManager(
     }
 
     fun getBoardState(): ULong {
+        if(boards == null) return empty
         var board: ULong = empty
 
         for (piece in boards) {
@@ -280,7 +281,7 @@ class BoardStateManager(
         return threatened
     }
 
-    fun simulateAtk(attacker: Int, target: Int): Boolean {
+    private fun simulateAtk(attacker: Int, target: Int): Boolean {
         val simulated = ChessMove(initialIndex = attacker, targetIndex = target)
         val chessPiece: EPieceType = getPieceAt(attacker)
             ?: throw IllegalArgumentException("Attacker should not be null!")
@@ -296,7 +297,7 @@ class BoardStateManager(
         return Triple(bKingMoved, bLeftRookMoved, bRightRookMoved)
     }
 
-    fun checkKingRooksMoved(piece: EPieceType, index: Int) {
+    private fun checkKingRooksMoved(piece: EPieceType, index: Int) {
         when (piece) {
             EPieceType.BKing -> bKingMoved = true
             EPieceType.WKing -> wKingMoved = true

@@ -6,18 +6,19 @@ import utils.isWhite
 import utils.isWithinBoard
 import utils.willFileOverflow
 import chessData.EPieceType
+import chessStateManagement.BoardStateManager
 import chessStateManagement.GameManager
 
 open class SingleStep(
-    gm: GameManager,
+    bsm: BoardStateManager,
     piece: EPieceType,
     movePattern: Array<Int>
 ) :
-    ChessPiece(gm, piece, movePattern) {
+    ChessPiece(bsm, piece, movePattern) {
 
     override fun findMoves(index: Int): ULong {
         var moves = empty
-        val board = gm.getBSM().getBoardState()
+        val board = bsm.getBoardState()
 
         for (step in movePattern) {
             if (willFileOverflow(index, index + step)
@@ -36,8 +37,8 @@ open class SingleStep(
 
     override fun findAttacks(index: Int): ULong {
         var attacks = empty
-        val enemyBoard = gm.getBSM().getColorBoard(!isWhite(piece))
-        val allyBoard = gm.getBSM().getColorBoard(isWhite(piece))
+        val enemyBoard = bsm.getColorBoard(!isWhite(piece))
+        val allyBoard = bsm.getColorBoard(isWhite(piece))
 
         for (step in movePattern) {
             if (willFileOverflow(index, index + step)

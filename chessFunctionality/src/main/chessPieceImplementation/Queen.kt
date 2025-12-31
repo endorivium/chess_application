@@ -3,6 +3,6 @@ package chessPieceImplementation
 import utils.omniDirectional
 import chessData.EPieceType
 import chessPieceImplementation.baseImplementation.ChessPiece
-import chessStateManagement.GameManager
+import chessStateManagement.BoardStateManager
 
-class Queen(gm: GameManager, piece: EPieceType) : ChessPiece(gm, piece, omniDirectional)
+class Queen(bsm: BoardStateManager, piece: EPieceType) : ChessPiece(bsm, piece, omniDirectional)

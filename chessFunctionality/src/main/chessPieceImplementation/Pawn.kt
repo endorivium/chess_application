@@ -9,17 +9,18 @@ import chessPieceImplementation.baseImplementation.ChessPiece
 import chessData.ChessMove
 import chessData.EPieceType
 import chessData.MoveSet
+import chessStateManagement.BoardStateManager
 import chessStateManagement.GameManager
 import kotlin.math.abs
 
-class Pawn(gm: GameManager, piece: EPieceType): ChessPiece(gm, piece = piece) {
+class Pawn(val gm: GameManager, bsm: BoardStateManager, piece: EPieceType): ChessPiece(bsm, piece = piece) {
 
     override fun getPossibleMoves(index: Int): MoveSet {
         val push = getPush(index)
         val attack = getAttack(index)
 
         //gets pushes that are actually possible by combining (xor) and then excluding (and)
-        val possibleMoves: ULong = (push xor gm.getBSM().getBoardState()) and push
+        val possibleMoves: ULong = (push xor bsm.getBoardState()) and push
         //printBitDebug(possibleMoves, "possibleMoves: ")
         return MoveSet(possibleMoves, attack)
     }
@@ -27,7 +28,7 @@ class Pawn(gm: GameManager, piece: EPieceType): ChessPiece(gm, piece = piece) {
     fun getPush(index: Int): ULong {
         val singlePush = pushSingle(index)
         val doublePush = pushDouble(index)
-        val boardState = gm.getBSM().getBoardState()
+        val boardState = bsm.getBoardState()
         var forwardMoves = singlePush xor doublePush
         forwardMoves = (forwardMoves xor boardState) and forwardMoves
 
@@ -39,13 +40,13 @@ class Pawn(gm: GameManager, piece: EPieceType): ChessPiece(gm, piece = piece) {
         if(index%8 != 0 && index in 8..55){
             leftAttack = flipBit(bitIndex = index + mod*7)
         }
-        leftAttack = leftAttack and gm.getBSM().getColorBoard(!isWhite(piece))
+        leftAttack = leftAttack and bsm.getColorBoard(!isWhite(piece))
 
         var rightAttack: ULong = empty
         if(index%7 != 0 && index in 8..55){
             rightAttack = flipBit(bitIndex = index + mod*9)
         }
-        rightAttack = rightAttack and gm.getBSM().getColorBoard(!isWhite(piece))
+        rightAttack = rightAttack and bsm.getColorBoard(!isWhite(piece))
 
         val attack: ULong = leftAttack xor rightAttack xor enPassantMove(index)
         //printBitDebug(attack, "attack: ")
