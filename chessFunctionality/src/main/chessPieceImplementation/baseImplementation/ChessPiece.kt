@@ -2,18 +2,14 @@ package chessPieceImplementation.baseImplementation
 
 import utils.empty
 import utils.flipBit
-import utils.isWhite
 import utils.isWithinBoard
 import utils.willFileOverflow
 import chessData.EMoveType
 import chessData.EPieceType
 import chessData.MoveSet
 import chessData.ChessMove
-import chessStateManagement.BoardStateManager
-import chessStateManagement.GameManager
 
 open class ChessPiece(
-    val bsm: BoardStateManager,
     val piece: EPieceType = EPieceType.WPawn,
     val movePattern: Array<Int> = emptyArray(),
     protected var mod: Int = 0){
@@ -26,13 +22,12 @@ open class ChessPiece(
     returns possible moves for given chess piece
     first ULong is normal movement, second is attack
     */
-    open fun getPossibleMoves(index: Int): MoveSet {
-        return MoveSet(findMoves(index), findAttacks(index))
+    open fun getPossibleMoves(index: Int, board: ULong, allyBoard: ULong, enemyBoard: ULong): MoveSet {
+        return MoveSet(findMoves(index, board), findAttacks(index, allyBoard, enemyBoard))
     }
 
-    open fun findMoves(index: Int): ULong{
+    open fun findMoves(index: Int, board: ULong): ULong{
         var moves = empty
-        val board = bsm.getBoardState()
 
         for(step in movePattern) {
             var next = index
@@ -54,10 +49,10 @@ open class ChessPiece(
         return moves
     }
 
-    open fun findAttacks(index: Int): ULong{
+    open fun findAttacks(index: Int, allyBoard: ULong, enemyBoard: ULong): ULong{
         var attacks = empty
-        val enemyBoard = bsm.getColorBoard(!isWhite(piece))
-        val allyBoard = bsm.getColorBoard(isWhite(piece))
+//        val enemyBoard = bsm.getColorBoard(!isWhite(piece))
+//        val allyBoard = bsm.getColorBoard(isWhite(piece))
 
         for(step in movePattern){
             var next = index
@@ -85,8 +80,8 @@ open class ChessPiece(
         return attacks
     }
 
-    fun canExecuteMove(move: ChessMove): Pair<Boolean, EMoveType?> {
-        val possibleMoves = getPossibleMoves(move.initialIndex)
+    fun canExecuteMove(move: ChessMove, board: ULong, allyBoard: ULong, enemyBoard: ULong): Pair<Boolean, EMoveType?> {
+        val possibleMoves = getPossibleMoves(move.initialIndex, board, allyBoard, enemyBoard)
         val desiredMove = flipBit(empty, move.targetIndex)
 
         if((possibleMoves.move and desiredMove).countOneBits() >= 1){

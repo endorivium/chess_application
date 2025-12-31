@@ -8,12 +8,11 @@ import chessData.EPieceType
 import chessData.MoveSet
 import chessPieceImplementation.baseImplementation.SingleStep
 import chessStateManagement.BoardStateManager
-import chessStateManagement.GameManager
 
-class King(bsm: BoardStateManager, piece: EPieceType) : SingleStep(bsm, piece, omniDirectional) {
+class King(val bsm: BoardStateManager, piece: EPieceType) : SingleStep(piece, omniDirectional) {
 
-    override fun getPossibleMoves(index: Int): MoveSet {
-        val moves = super.getPossibleMoves(index)
+    override fun getPossibleMoves(index: Int, board: ULong, allyBoard: ULong, enemyBoard: ULong): MoveSet {
+        val moves = super.getPossibleMoves(index, board, allyBoard, enemyBoard)
 
         if(piece == EPieceType.BKing && bsm.bKingMoved) return moves
         if(piece == EPieceType.WKing && bsm.wKingMoved) return moves

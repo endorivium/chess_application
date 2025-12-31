@@ -54,8 +54,7 @@ class BoardRenderer() {
         if(check) {
             printCheck()
         }
-
-        println("\n")
+        print("\n")
     }
 
     fun refreshRendering(board: ULong, pieceBoards: Array<ULong>): Array<String> {

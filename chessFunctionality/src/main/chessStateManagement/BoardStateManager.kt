@@ -91,7 +91,9 @@ open class BoardStateManager(
 
         val pieceRule = gm.getRules(chessPiece)
 
-        val possibleMoves = pieceRule.getPossibleMoves(move.initialIndex)
+        val possibleMoves = pieceRule.getPossibleMoves(
+            move.initialIndex, getBoardState(),
+            getColorBoard(whiteTurn), getColorBoard(!whiteTurn))
 
         return Pair(true, getBoardIndices(possibleMoves.move))
     }
@@ -102,7 +104,8 @@ open class BoardStateManager(
 
         val pieceRule = gm.getRules(chessPiece)
 
-        val moveExec = pieceRule.canExecuteMove(move)
+        val moveExec = pieceRule.canExecuteMove(move, getBoardState(),
+            getColorBoard(whiteTurn), getColorBoard(!whiteTurn))
         if (moveExec.first) {
             when (moveExec.second!!) {
                 EMoveType.Push -> execPush(chessPiece, move)
@@ -288,7 +291,9 @@ open class BoardStateManager(
 
         val pieceRule = gm.getRules(chessPiece)
 
-        return pieceRule.canExecuteMove(simulated).first
+        val white = isWhite(chessPiece)
+        return pieceRule.canExecuteMove(simulated, getBoardState(),
+            getColorBoard(white), getColorBoard(!white)).first
     }
 
     fun haveKingRooksMoved(isWPlayer: Boolean): Triple<Boolean, Boolean, Boolean> {
