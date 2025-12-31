@@ -1,13 +1,13 @@
-package main.chessStateManagement
+package chessStateManagement
 
-import main.boardRendering.BoardRenderer
-import main.utils.toAlgebraic
-import main.chessData.ChessMove
-import main.chessData.EPieceType
-import main.chessPieceImplementation.RuleBook
-import main.chessPieceImplementation.baseImplementation.ChessPiece
-import main.inputHandling.EOutputType
-import main.inputHandling.InputHandler
+import boardRendering.BoardRenderer
+import utils.toAlgebraic
+import chessData.ChessMove
+import chessData.EPieceType
+import chessPieceImplementation.RuleBook
+import chessPieceImplementation.baseImplementation.ChessPiece
+import inputHandling.EOutputType
+import inputHandling.InputHandler
 
 class GameManager(
     var inputHandler: InputHandler = InputHandler(),
@@ -84,7 +84,7 @@ class GameManager(
 
     fun handleMove(playerMove: ChessMove?) {
         if (playerMove == null) {
-            println("Error! Move was not formatted correctly")
+            println("Command could not be executed.")
             return
         }
 

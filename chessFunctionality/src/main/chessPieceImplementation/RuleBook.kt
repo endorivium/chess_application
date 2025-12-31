@@ -1,7 +1,7 @@
-package main.chessPieceImplementation
+package chessPieceImplementation
 
-import main.chessData.EPieceType
-import main.chessStateManagement.GameManager
+import chessData.EPieceType
+import chessStateManagement.GameManager
 
 class RuleBook(gameManager: GameManager) {
     val rules = mapOf(

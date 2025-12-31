@@ -1,11 +1,11 @@
-package main.boardRendering
+package boardRendering
 
-import main.utils.getBit
-import main.utils.getBoardIndices
-import main.utils.isWhite
-import main.utils.toAlgebraic
-import main.chessData.EPieceType
-import main.chessStateManagement.GameManager
+import utils.getBit
+import utils.getBoardIndices
+import utils.isWhite
+import utils.toAlgebraic
+import chessData.EPieceType
+import chessStateManagement.GameManager
 
 class BoardRenderer(val gm: GameManager) {
     val pieceIcons = arrayOf(

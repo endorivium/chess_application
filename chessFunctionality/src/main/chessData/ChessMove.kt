@@ -1,9 +1,9 @@
-package main.chessData
+package chessData
 
-import main.utils.toIndex
+import utils.toIndex
 
 /*
-chessPiece should only be used to record chess moves
+chessPiece is only used to record move history and is not assigned until after execution of the move
  */
 data class ChessMove(
     val initialCoord: String = "",

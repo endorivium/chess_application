@@ -1,4 +1,4 @@
-package main.chessData
+package chessData
 
 enum class EMoveType {
     Push,

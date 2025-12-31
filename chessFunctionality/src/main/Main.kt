@@ -1,4 +1,4 @@
-import main.chessStateManagement.GameManager
+import chessStateManagement.GameManager
 
 val gameManager: GameManager = GameManager()
 fun main() {

@@ -1,6 +1,6 @@
-package main.utils
+package utils
 
-import main.chessData.EPieceType
+import chessData.EPieceType
 import kotlin.code
 import kotlin.math.abs
 

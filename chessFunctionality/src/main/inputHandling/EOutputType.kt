@@ -1,4 +1,4 @@
-package main.inputHandling
+package inputHandling
 
 enum class EOutputType {
     Move,

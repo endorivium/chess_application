@@ -1,7 +1,7 @@
-package main.chessPieceImplementation
-import main.utils.omniDiagonal
-import main.chessData.EPieceType
-import main.chessPieceImplementation.baseImplementation.ChessPiece
-import main.chessStateManagement.GameManager
+package chessPieceImplementation
+import utils.omniDiagonal
+import chessData.EPieceType
+import chessPieceImplementation.baseImplementation.ChessPiece
+import chessStateManagement.GameManager
 
 class Bishop(gm: GameManager, piece: EPieceType): ChessPiece(gm, piece, omniDiagonal)

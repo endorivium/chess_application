@@ -1,4 +1,4 @@
-package main.utils
+package utils
 
 import kotlin.math.round
 

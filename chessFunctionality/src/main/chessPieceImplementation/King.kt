@@ -1,13 +1,13 @@
-package main.chessPieceImplementation
+package chessPieceImplementation
 
-import main.utils.empty
-import main.utils.flipBit
-import main.utils.isWhite
-import main.utils.omniDirectional
-import main.chessData.EPieceType
-import main.chessData.MoveSet
-import main.chessPieceImplementation.baseImplementation.SingleStep
-import main.chessStateManagement.GameManager
+import utils.empty
+import utils.flipBit
+import utils.isWhite
+import utils.omniDirectional
+import chessData.EPieceType
+import chessData.MoveSet
+import chessPieceImplementation.baseImplementation.SingleStep
+import chessStateManagement.GameManager
 
 class King(gm: GameManager, piece: EPieceType) : SingleStep(gm, piece, omniDirectional) {
 
