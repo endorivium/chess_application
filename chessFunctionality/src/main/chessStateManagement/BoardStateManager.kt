@@ -13,12 +13,14 @@ import utils.willFileOverflow
 import chessData.ChessMove
 import chessData.EMoveType
 import chessData.EPieceType
+import chessPieceImplementation.RuleBook
 
 
 open class BoardStateManager(
-    private val gm: GameManager,
     val moveHistory: MutableList<ChessMove> = mutableListOf()
 ) {
+    private var ruleBook: RuleBook = RuleBook(this)
+
     //region GameStateVariables
     var wKingMoved = false
     var wLeftRookMoved = false
@@ -27,6 +29,8 @@ open class BoardStateManager(
     var bKingMoved = false
     var bLeftRookMoved = false
     var bRightRookMoved = false
+
+    var pawnTransform = false
     //endregion
 
     //region BlackBoard
@@ -85,41 +89,48 @@ open class BoardStateManager(
         bRightRookMoved = false
     }
 
-    fun findPossibleMoves(move: ChessMove, whiteTurn: Boolean): Pair<Boolean, MutableList<Int>> {
+    fun findPossibleMoves(move: ChessMove, whiteTurn: Boolean): Pair<EPieceType?, MutableList<Int>> {
         val chessPiece: EPieceType = getPieceAt(move.initialIndex, whiteTurn)
-            ?: return Pair(false, mutableListOf())
+            ?: return Pair(null, mutableListOf())
 
-        val pieceRule = gm.getRules(chessPiece)
+        val pieceRule = ruleBook.getRules(chessPiece)
 
         val possibleMoves = pieceRule.getPossibleMoves(
             move.initialIndex, getBoardState(),
             getColorBoard(whiteTurn), getColorBoard(!whiteTurn))
 
-        return Pair(true, getBoardIndices(possibleMoves.move))
+        return Pair(chessPiece, getBoardIndices(possibleMoves.move))
     }
 
-    fun execChessMove(move: ChessMove, whiteTurn: Boolean): Boolean {
-        val chessPiece: EPieceType = getPieceAt(move.initialIndex, whiteTurn)
-            ?: return false
+    fun execChessMove(move: ChessMove, whiteTurn: Boolean): Pair<Boolean, ChessMove?> {
+        move.chessPiece = getPieceAt(move.initialIndex, whiteTurn)
+            ?: return Pair(false, null)
 
-        val pieceRule = gm.getRules(chessPiece)
+        val pieceRule = ruleBook.getRules(move.chessPiece)
 
         val moveExec = pieceRule.canExecuteMove(move, getBoardState(),
             getColorBoard(whiteTurn), getColorBoard(!whiteTurn))
         if (moveExec.first) {
             when (moveExec.second!!) {
-                EMoveType.Push -> execPush(chessPiece, move)
-                EMoveType.Attack -> execAttack(chessPiece, move, whiteTurn)
-                else -> execRochade(chessPiece, move)
+                EMoveType.Move -> execMove(move.chessPiece, move)
+                EMoveType.Attack -> execAttack(move.chessPiece, move, whiteTurn)
+                else -> execRochade(move.chessPiece, move)
             }
 
-            checkKingRooksMoved(chessPiece, move.initialIndex)
-            return true
+            checkKingRooksMoved(move.chessPiece, move.initialIndex)
+            recordMove(move)
+            return Pair(true, if(pawnTransform) move else null)
         }
-        return false
+        return Pair(false, null)
     }
 
-    private fun execPush(piece: EPieceType, move: ChessMove) {
+    fun execPawnTransformation(move: ChessMove, transform: EPieceType){
+        boards[move.chessPiece.ordinal] = flipBit(boards[move.chessPiece.ordinal], move.targetIndex)
+        boards[transform.ordinal] = flipBit(boards[transform.ordinal], move.targetIndex)
+        pawnTransform = false
+    }
+
+    private fun execMove(piece: EPieceType, move: ChessMove) {
         boards[piece.ordinal] = swapBit(boards[piece.ordinal], move.initialIndex, move.targetIndex)
     }
 
@@ -188,17 +199,17 @@ open class BoardStateManager(
     }
 
     fun getColorBoard(white: Boolean): ULong {
-        var enemyBoard: ULong = empty
+        var board: ULong = empty
         if (white) {
             for (i in 0..5) {
-                enemyBoard = enemyBoard xor getPieceBoard(EPieceType.fromInt(i)!!)
+                board = board xor getPieceBoard(EPieceType.fromInt(i)!!)
             }
         } else {
             for (i in 6..11) {
-                enemyBoard = enemyBoard xor getPieceBoard(EPieceType.fromInt(i)!!)
+                board = board xor getPieceBoard(EPieceType.fromInt(i)!!)
             }
         }
-        return enemyBoard
+        return board
     }
 
     fun getPieceBoards(): Array<ULong> {
@@ -289,11 +300,11 @@ open class BoardStateManager(
         val chessPiece: EPieceType = getPieceAt(attacker)
             ?: throw IllegalArgumentException("Attacker should not be null!")
 
-        val pieceRule = gm.getRules(chessPiece)
+        val pieceRule = ruleBook.getRules(chessPiece)
 
         val white = isWhite(chessPiece)
         return pieceRule.canExecuteMove(simulated, getBoardState(),
-            getColorBoard(white), getColorBoard(!white)).first
+            getColorBoard(white), getColorBoard(!white), true).first
     }
 
     fun haveKingRooksMoved(isWPlayer: Boolean): Triple<Boolean, Boolean, Boolean> {
@@ -364,7 +375,7 @@ open class BoardStateManager(
         return isCheck(whiteTurn) && availableSquares.countOneBits() == 0
     }
 
-    fun recordMove(move: ChessMove){
+    private fun recordMove(move: ChessMove){
         moveHistory.add(move)
     }
 
@@ -377,5 +388,9 @@ open class BoardStateManager(
             true,
             moveHistory[moveHistory.lastIndex]
         )
+    }
+
+    fun notifyPawnTransformation(){
+        pawnTransform = true
     }
 }

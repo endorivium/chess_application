@@ -1,6 +1,7 @@
 package chessPieceImplementation
 
 import chessData.EPieceType
+import chessPieceImplementation.baseImplementation.ChessPiece
 import chessStateManagement.BoardStateManager
 import chessStateManagement.GameManager
 
@@ -19,4 +20,10 @@ class RuleBook(bsm: BoardStateManager) {
         EPieceType.BQueen to Queen(EPieceType.BQueen),
         EPieceType.BRook to Rook(EPieceType.BRook)
     )
+
+    fun getRules(chessPiece: EPieceType): ChessPiece {
+        val pieceRules = rules[chessPiece]
+            ?: throw IllegalArgumentException("Chess Piece $chessPiece was not found in Rule Set!")
+        return pieceRules
+    }
 }

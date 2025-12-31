@@ -1,7 +1,7 @@
 package chessData
 
 enum class EMoveType {
-    Push,
+    Move,
     Attack,
     Rochade
 }

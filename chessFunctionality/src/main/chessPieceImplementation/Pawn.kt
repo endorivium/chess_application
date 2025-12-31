@@ -6,9 +6,11 @@ import utils.isFile
 import utils.isWithinRanks
 import chessPieceImplementation.baseImplementation.ChessPiece
 import chessData.ChessMove
+import chessData.EMoveType
 import chessData.EPieceType
 import chessData.MoveSet
 import chessStateManagement.BoardStateManager
+import utils.isRank
 import kotlin.math.abs
 
 class Pawn(private val bsm: BoardStateManager, piece: EPieceType): ChessPiece(piece = piece) {
@@ -16,11 +18,26 @@ class Pawn(private val bsm: BoardStateManager, piece: EPieceType): ChessPiece(pi
     override fun getPossibleMoves(index: Int, board: ULong, allyBoard: ULong, enemyBoard: ULong): MoveSet {
         val push = getPush(index, board)
         val attack = getAttack(index, enemyBoard)
-
-        //gets pushes that are actually possible by combining (xor) and then excluding (and)
         val possibleMoves: ULong = (push xor board) and push
-        //printBitDebug(possibleMoves, "possibleMoves: ")
+
         return MoveSet(possibleMoves, attack)
+    }
+
+
+
+    override fun canExecuteMove(
+        move: ChessMove,
+        board: ULong,
+        allyBoard: ULong,
+        enemyBoard: ULong,
+        simulated: Boolean
+    ): Pair<Boolean, EMoveType?> {
+        if(!simulated){
+            if(isRank(1, move.targetIndex) || isRank(8, move.targetIndex)){
+                notifyTransformation()
+            }
+        }
+        return super.canExecuteMove(move, board, allyBoard, enemyBoard, simulated)
     }
 
     fun getPush(index: Int, board: ULong): ULong {
@@ -46,7 +63,6 @@ class Pawn(private val bsm: BoardStateManager, piece: EPieceType): ChessPiece(pi
         rightAttack = rightAttack and enemyBoard
 
         val attack: ULong = leftAttack xor rightAttack xor enPassantMove(index)
-        //printBitDebug(attack, "attack: ")
         return attack
     }
 
@@ -100,5 +116,9 @@ class Pawn(private val bsm: BoardStateManager, piece: EPieceType): ChessPiece(pi
         }
         //printBitDebug(doublePush, "pushDouble: ")
         return doublePush
+    }
+
+    fun notifyTransformation(){
+        bsm.notifyPawnTransformation()
     }
 }

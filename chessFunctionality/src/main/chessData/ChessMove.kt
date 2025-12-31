@@ -9,8 +9,9 @@ data class ChessMove(
     val initialCoord: String = "",
     val targetCoord: String = "",
     var initialIndex: Int = -1,
-    var targetIndex: Int = -1,
-    var chessPiece: EPieceType? = null) {
+    var targetIndex: Int = -1) {
+    lateinit var chessPiece: EPieceType
+
     init{
         if(!initialCoord.isEmpty()) {
             initialIndex = toIndex(initialCoord)
@@ -20,7 +21,7 @@ data class ChessMove(
         }
     }
 
-    fun assignChessPiece(piece: EPieceType?) {
+    fun assignChessPiece(piece: EPieceType) {
         chessPiece = piece
     }
 }

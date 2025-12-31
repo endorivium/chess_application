@@ -2,17 +2,20 @@ package inputHandling
 
 import utils.isInAlgebraicNotation
 import chessData.ChessMove
+import chessData.EPieceType
+import utils.isWhite
 import java.util.Locale.getDefault
 import kotlin.system.exitProcess
 
 class InputHandler(
-    private val keywords: Array<String> = arrayOf("help", "check", "an", "quit", "move", "demo", "demos", "reset"),
+    private val keywords: Array<String> = arrayOf("help", "check", "an", "quit", "move", "demos", "demo", "reset"),
     private val automatedGame: Array<Array<String>> = arrayOf(
         arrayOf("f2f3", "e7e6", "g2g4", "d8h4"),
         arrayOf("e2e3", "f7f6", "g1h3", "g7g5", "d1h5"),
         arrayOf("e2e3", "b8a6", "a2a3", "d7d6", "b2b3", "c8e6", "c2c3", "d8d7", "d2d3", "e8c8"),
         arrayOf("g2g3", "a7a6", "f1h3", "b7b6", "g1f3", "c7c6", "e1g1"),
-        arrayOf("d2d4", "a7a6", "d4d5", "c7c5", "d5c5")
+        arrayOf("d2d4", "a7a6", "d4d5", "c7c5", "d5c5"),
+        arrayOf("f2f4", "g8h6", "f4f5", "g7g5", "f5g5", "b8c6", "g5g6", "a7a6", "g6g7", "d7d5", "g7g8")
     )
 ) {
     //region AutomatedGame
@@ -37,6 +40,38 @@ class InputHandler(
         return ""
     }
 
+    fun handlePawnTransform(piece: EPieceType): Int{
+        println("$piece has reached board edge!")
+        var chosen: Int? = null
+        while(chosen == null) {
+            print("Please choose a chess piece by typing its corresponding number:\n" +
+                    "> 0: Bishop\n" +
+                    "> 1: Knight\n" +
+                    "> 2: Queen\n" +
+                    "> 3: Rook\n--------------\n" +
+                    "> " )
+            var input = readln()
+            input = input.lowercase()
+            input = cleanString(string = input)
+            chosen = input.toIntOrNull()
+
+            if (chosen == null || chosen !in 0..3) {
+                chosen = null
+                print("Input was not valid. ")
+            } else {
+                val isWPlayer = isWhite(piece)
+                println("\nTransforming pawn into chosen piece!")
+                return when(chosen){
+                    0 -> if(isWPlayer) 0 else 6
+                    1 -> if(isWPlayer) 2 else 8
+                    2 -> if(isWPlayer) 4 else 10
+                    else -> if(isWPlayer) 5 else 11
+                }
+            }
+        }
+        return -1
+    }
+
     //handles the help cmd by printing out a list of all possible game commands
     private fun handleHelpCmd(): EOutputType {
         println(
@@ -54,12 +89,13 @@ class InputHandler(
 
     private fun handleDemosCmd(): EOutputType {
         println(
-            "The following chess demos are preprogrammed and can be run through via the 'auto' command.\n" +
+            "The following (semi-nonsense) chess demos are preprogrammed and can be run through via the 'auto' command.\n" +
                     "> 0: Fool's Mate. Checkmate in four moves. Black wins.\n" +
                     "> 1: Reverse Fool's Mate. Checkmate in five moves. White wins.\n" +
-                    "> 2: Black King Long Rochade\n" +
-                    "> 3: White King Short Rochade" +
-                    "> 4: Pawn en Passant"
+                    "> 2: Black King Long Rochade.\n" +
+                    "> 3: White King Short Rochade.\n" +
+                    "> 4: Pawn en Passant.\n" +
+                    "> 5: Pawn transformation."
         )
         return EOutputType.None
     }
@@ -97,7 +133,7 @@ class InputHandler(
     }
 
     private fun handleDemoCmd(input: String): ChessMove? {
-        val cleanedString = cleanString(keywords[5], input)
+        val cleanedString = cleanString(keywords[6], input)
         gameIndex = cleanedString.toIntOrNull()
         if (gameIndex == null || gameIndex!! > automatedGame.lastIndex) {
             println("GameIndex was not valid or does not exist. Automated game cannot be started.")
@@ -121,7 +157,7 @@ class InputHandler(
         return Pair(false, null)
     }
 
-    fun cleanString(keyword: String, string: String): String {
+    fun cleanString(keyword: String = "", string: String): String {
         var cleanedString = string
         cleanedString = cleanedString.replace(keyword, "")
         cleanedString = cleanedString.replace("to", "")
@@ -145,8 +181,8 @@ class InputHandler(
             keywords[1] -> Pair(EOutputType.MoveCheck, handleCheckCmd(normedInput))
             keywords[2] -> Pair(handleAlgebraicNotationCmd(), null)
             keywords[3] -> exitProcess(0)
-            keywords[5] -> Pair(EOutputType.Move, handleDemoCmd(normedInput))
-            keywords[6] -> Pair(handleDemosCmd(), null)
+            keywords[5] -> Pair(handleDemosCmd(), null)
+            keywords[6] -> Pair(EOutputType.Move, handleDemoCmd(normedInput))
             keywords[7] -> Pair(EOutputType.Reset, null)
             else -> Pair(EOutputType.Move, handleMoveCmd(normedInput))
         }

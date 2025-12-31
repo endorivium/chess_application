@@ -4,27 +4,21 @@ import boardRendering.BoardRenderer
 import utils.toAlgebraic
 import chessData.ChessMove
 import chessData.EPieceType
-import chessPieceImplementation.RuleBook
-import chessPieceImplementation.baseImplementation.ChessPiece
 import inputHandling.EOutputType
 import inputHandling.InputHandler
 
 open class GameManager(
-    private var inputHandler: InputHandler = InputHandler()
+    private var inputHandler: InputHandler = InputHandler(),
+    private var renderer: BoardRenderer = BoardRenderer(),
+    private var bsm: BoardStateManager = BoardStateManager()
 ) {
-    private lateinit var bsm: BoardStateManager
-    private lateinit var ruleBook: RuleBook
-    private lateinit var renderer: BoardRenderer
 
     private var whiteTurn = true
     private var gameEnded = false
 
     private fun initializeGame() {
         inputHandler.initialize()
-        bsm = BoardStateManager(this)
         bsm.initialize()
-        ruleBook = RuleBook(bsm)
-        renderer = BoardRenderer()
         whiteTurn = true
         gameEnded = false
     }
@@ -32,8 +26,10 @@ open class GameManager(
     fun startGameLoop() {
         initializeGame()
         var playerMove: Pair<EOutputType, ChessMove?>
-        renderer.renderBoard(whiteTurn, check = false, checkMate = false,
-            bsm.getBoardState(), bsm.getPieceBoards())
+        renderer.renderBoard(
+            whiteTurn, check = false, checkMate = false,
+            bsm.getBoardState(), bsm.getPieceBoards()
+        )
         while (!gameEnded) {
             playerMove = inputHandler.readInput()
 
@@ -44,8 +40,10 @@ open class GameManager(
 
             val check = bsm.isCheck(whiteTurn)
             val checkMate = bsm.isCheckMate(whiteTurn)
-            renderer.renderBoard(whiteTurn, check, checkMate,
-                bsm.getBoardState(), bsm.getPieceBoards())
+            renderer.renderBoard(
+                whiteTurn, check, checkMate,
+                bsm.getBoardState(), bsm.getPieceBoards()
+            )
             gameEnded = checkMate
         }
         //TODO("as if wants to play again via input handler")
@@ -71,9 +69,8 @@ open class GameManager(
         }
 
         val squares = bsm.findPossibleMoves(playerMove, whiteTurn)
-        val chessPiece = bsm.getPieceAt(playerMove.initialIndex)
 
-        if (chessPiece == null) {
+        if (squares.first == null) {
             println(
                 "Error! There is either no chess piece at " +
                         "${toAlgebraic(playerMove.initialIndex)} or it is not one of yours!"
@@ -81,7 +78,7 @@ open class GameManager(
             return
         }
 
-        renderer.printPossibleMoves(chessPiece, playerMove.initialIndex, squares.second, whiteTurn)
+        renderer.printPossibleMoves(squares.first!!, playerMove.initialIndex, squares.second, whiteTurn)
     }
 
     private fun handleMove(playerMove: ChessMove?) {
@@ -91,21 +88,25 @@ open class GameManager(
         }
 
         println("Registered Move: " + playerMove.initialCoord + "|" + playerMove.targetCoord)
-        playerMove.assignChessPiece(bsm.getPieceAt(playerMove.initialIndex))
 
-        if (bsm.execChessMove(playerMove, whiteTurn)) {
-            bsm.recordMove(playerMove)
-
+        val execResult = bsm.execChessMove(playerMove, whiteTurn)
+        if (execResult.first) {
             whiteTurn = !whiteTurn
             println("Move was executed successfully!")
+
+            if(execResult.second != null) {
+                renderer.renderBoard(
+                    whiteTurn, check = false, checkMate = false,
+                    bsm.getBoardState(), bsm.getPieceBoards()
+                )
+
+                val chosenTransformIndex = inputHandler.handlePawnTransform(execResult.second!!.chessPiece)
+                val chosenTransform = EPieceType.fromInt(chosenTransformIndex)
+                    ?: throw IllegalStateException("Index of chosen pawn transform was null when converting to EPieceType!")
+                bsm.execPawnTransformation(playerMove, chosenTransform)
+            }
         } else {
             println("Error! Move could not be executed. It is either not your turn or there was no chess piece on that square.")
         }
-    }
-
-    fun getRules(chessPiece: EPieceType): ChessPiece {
-        val pieceRules = ruleBook.rules[chessPiece]
-            ?: throw IllegalArgumentException("Chess Piece $chessPiece was not found in Rule Set!")
-        return pieceRules
     }
 }

@@ -23,11 +23,10 @@ fun isFile(file: Char, index: Int): Boolean {
 }
 
 fun isRank(rank: Int, index: Int): Boolean {
-    return index/8 == rank
+    return index/8 + 1 == rank
 }
 
 fun getBoardIndices(board: ULong): MutableList<Int> {
-    val search = board
     val indices: MutableList<Int> = mutableListOf()
 
     for(i in 0..63){

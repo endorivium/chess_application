@@ -80,12 +80,12 @@ open class ChessPiece(
         return attacks
     }
 
-    fun canExecuteMove(move: ChessMove, board: ULong, allyBoard: ULong, enemyBoard: ULong): Pair<Boolean, EMoveType?> {
+    open fun canExecuteMove(move: ChessMove, board: ULong, allyBoard: ULong, enemyBoard: ULong, simulated: Boolean = false): Pair<Boolean, EMoveType?> {
         val possibleMoves = getPossibleMoves(move.initialIndex, board, allyBoard, enemyBoard)
         val desiredMove = flipBit(empty, move.targetIndex)
 
         if((possibleMoves.move and desiredMove).countOneBits() >= 1){
-            return Pair(true, EMoveType.Push)
+            return Pair(true, EMoveType.Move)
         }
 
         if((possibleMoves.attack and desiredMove).countOneBits() >= 1){
