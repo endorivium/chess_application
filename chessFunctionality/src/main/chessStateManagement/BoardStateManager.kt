@@ -16,7 +16,8 @@ import chessData.EPieceType
 
 
 open class BoardStateManager(
-    private val gm: GameManager
+    private val gm: GameManager,
+    val moveHistory: MutableList<ChessMove> = mutableListOf()
 ) {
     //region GameStateVariables
     var wKingMoved = false
@@ -208,7 +209,6 @@ open class BoardStateManager(
     }
 
     fun getBoardState(): ULong {
-        if(boards == null) return empty
         var board: ULong = empty
 
         for (piece in boards) {
@@ -357,5 +357,20 @@ open class BoardStateManager(
         val availableSquares = (threatenedSquares xor occupied) xor bitPerimeter
 
         return isCheck(whiteTurn) && availableSquares.countOneBits() == 0
+    }
+
+    fun recordMove(move: ChessMove){
+        moveHistory.add(move)
+    }
+
+    fun getPrevMove(): Pair<Boolean, ChessMove> {
+        if (moveHistory.isEmpty()) {
+            return Pair(false, ChessMove())
+        }
+
+        return Pair(
+            true,
+            moveHistory[moveHistory.lastIndex]
+        )
     }
 }

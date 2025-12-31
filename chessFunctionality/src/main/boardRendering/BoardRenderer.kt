@@ -8,7 +8,7 @@ import chessData.EPieceType
 import chessStateManagement.BoardStateManager
 import chessStateManagement.GameManager
 
-class BoardRenderer(val bsm: BoardStateManager) {
+class BoardRenderer() {
     val pieceIcons = arrayOf(
         "[\u265D]", "[\u265A]", "[\u265E]", "[\u265F]", "[\u265B]", "[\u265C]",
         "[\u2657]", "[\u2654]", "[\u2658]", "[\u2659]", "[\u2655]", "[\u2656]"
@@ -27,8 +27,10 @@ class BoardRenderer(val bsm: BoardStateManager) {
     )
     val file = " \uFFE3   [\uFF21][\uFF22][\uFF23][\uFF24][\uFF25][\uFF26][\uFF27][\uFF28]"
 
-    fun renderBoard(whiteTurn: Boolean, check: Boolean, checkMate: Boolean) {
-        val boardRender = refreshRendering()
+    fun renderBoard(
+        whiteTurn: Boolean, check: Boolean, checkMate: Boolean,
+        board: ULong, pieceBoards: Array<ULong>) {
+        val boardRender = refreshRendering(board, pieceBoards)
 
         print("\n")
         print("     \uFF1D\uFF1D  ")
@@ -56,9 +58,7 @@ class BoardRenderer(val bsm: BoardStateManager) {
         println("\n")
     }
 
-    fun refreshRendering(): Array<String> {
-        val board = bsm.getBoardState()
-        val pieceBoards = bsm.getPieceBoards()
+    fun refreshRendering(board: ULong, pieceBoards: Array<ULong>): Array<String> {
         val indices = getBoardIndices(board)
         val pieceRender = Array(64) { noPiece }
 

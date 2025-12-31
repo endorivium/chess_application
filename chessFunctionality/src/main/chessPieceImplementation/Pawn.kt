@@ -10,10 +10,9 @@ import chessData.ChessMove
 import chessData.EPieceType
 import chessData.MoveSet
 import chessStateManagement.BoardStateManager
-import chessStateManagement.GameManager
 import kotlin.math.abs
 
-class Pawn(val gm: GameManager, bsm: BoardStateManager, piece: EPieceType): ChessPiece(bsm, piece = piece) {
+class Pawn(bsm: BoardStateManager, piece: EPieceType): ChessPiece(bsm, piece = piece) {
 
     override fun getPossibleMoves(index: Int): MoveSet {
         val push = getPush(index)
@@ -77,9 +76,8 @@ class Pawn(val gm: GameManager, bsm: BoardStateManager, piece: EPieceType): Ches
         return empty
     }
 
-    //TODO: enPassant should only work if pawn piece was moves in previous move by enemy
     fun enPassantMove(index: Int): ULong {
-        val prevMove = gm.getPrevMove()
+        val prevMove = bsm.getPrevMove()
         if(!prevMove.first) return empty
         return leftEnPassant(index, prevMove.second) xor rightEnPassant(index, prevMove.second)
     }

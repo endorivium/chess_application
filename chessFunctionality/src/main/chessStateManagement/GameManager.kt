@@ -9,9 +9,8 @@ import chessPieceImplementation.baseImplementation.ChessPiece
 import inputHandling.EOutputType
 import inputHandling.InputHandler
 
-class GameManager(
-    var inputHandler: InputHandler = InputHandler(),
-    val moveHistory: MutableList<ChessMove> = mutableListOf()
+open class GameManager(
+    private var inputHandler: InputHandler = InputHandler()
 ) {
     private lateinit var bsm: BoardStateManager
     private lateinit var ruleBook: RuleBook
@@ -24,8 +23,8 @@ class GameManager(
         inputHandler.initialize()
         bsm = BoardStateManager(this)
         bsm.initialize()
-        ruleBook = RuleBook(this)
-        renderer = BoardRenderer(bsm)
+        ruleBook = RuleBook(bsm)
+        renderer = BoardRenderer()
         whiteTurn = true
         gameEnded = false
     }
@@ -33,7 +32,8 @@ class GameManager(
     fun startGameLoop() {
         initializeGame()
         var playerMove: Pair<EOutputType, ChessMove?>
-        renderer.renderBoard(whiteTurn, check = false, checkMate = false)
+        renderer.renderBoard(whiteTurn, check = false, checkMate = false,
+            bsm.getBoardState(), bsm.getPieceBoards())
         while (!gameEnded) {
             playerMove = inputHandler.readInput()
 
@@ -44,7 +44,8 @@ class GameManager(
 
             val check = bsm.isCheck(whiteTurn)
             val checkMate = bsm.isCheckMate(whiteTurn)
-            renderer.renderBoard(whiteTurn, check, checkMate)
+            renderer.renderBoard(whiteTurn, check, checkMate,
+                bsm.getBoardState(), bsm.getPieceBoards())
             gameEnded = checkMate
         }
         //TODO("as if wants to play again via input handler")
@@ -93,28 +94,13 @@ class GameManager(
         playerMove.assignChessPiece(bsm.getPieceAt(playerMove.initialIndex))
 
         if (bsm.execChessMove(playerMove, whiteTurn)) {
-            moveHistory.add(playerMove)
+            bsm.recordMove(playerMove)
 
             whiteTurn = !whiteTurn
             println("Move was executed successfully!")
         } else {
             println("Error! Move could not be executed. It is either not your turn or there was no chess piece on that square.")
         }
-    }
-
-    fun getPrevMove(): Pair<Boolean, ChessMove> {
-        if (moveHistory.isEmpty()) {
-            return Pair(false, ChessMove())
-        }
-
-        return Pair(
-            true,
-            moveHistory[moveHistory.lastIndex]
-        )
-    }
-
-    fun getBSM(): BoardStateManager {
-        return bsm
     }
 
     fun getRules(chessPiece: EPieceType): ChessPiece {
