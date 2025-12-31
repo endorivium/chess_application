@@ -91,7 +91,7 @@ fun printBitDebug(bit: ULong, prefixTxt: String = "Initial Value:") {
     val bitText = bit.toString(2).padStart(64, '0')
 
     println(prefixTxt + indentation)
-    for (i in bitText.length - 1 downTo 0) {
+    for (i in bitText.indices) {
         if (i == 0 || i % 8 == 0)
             println(bitText.substring(i, i + 8))
     }
