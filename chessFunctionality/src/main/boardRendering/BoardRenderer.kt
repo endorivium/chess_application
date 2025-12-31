@@ -5,8 +5,6 @@ import utils.getBoardIndices
 import utils.isWhite
 import utils.toAlgebraic
 import chessData.EPieceType
-import chessStateManagement.BoardStateManager
-import chessStateManagement.GameManager
 
 class BoardRenderer() {
     val pieceIcons = arrayOf(

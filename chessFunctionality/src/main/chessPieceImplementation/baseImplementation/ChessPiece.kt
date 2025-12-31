@@ -22,7 +22,7 @@ open class ChessPiece(
     returns possible moves for given chess piece
     first ULong is normal movement, second is attack
     */
-    open fun getPossibleMoves(index: Int, board: ULong, allyBoard: ULong, enemyBoard: ULong): MoveSet {
+    open fun calcPossibleMoves(index: Int, board: ULong, allyBoard: ULong, enemyBoard: ULong): MoveSet {
         return MoveSet(findMoves(index, board), findAttacks(index, allyBoard, enemyBoard))
     }
 
@@ -81,7 +81,7 @@ open class ChessPiece(
     }
 
     open fun canExecuteMove(move: ChessMove, board: ULong, allyBoard: ULong, enemyBoard: ULong, simulated: Boolean = false): Pair<Boolean, EMoveType?> {
-        val possibleMoves = getPossibleMoves(move.initialIndex, board, allyBoard, enemyBoard)
+        val possibleMoves = calcPossibleMoves(move.initialIndex, board, allyBoard, enemyBoard)
         val desiredMove = flipBit(empty, move.targetIndex)
 
         if((possibleMoves.move and desiredMove).countOneBits() >= 1){

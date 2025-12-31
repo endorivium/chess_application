@@ -19,7 +19,7 @@ import chessPieceImplementation.RuleBook
 open class BoardStateManager(
     val moveHistory: MutableList<ChessMove> = mutableListOf()
 ) {
-    private var ruleBook: RuleBook = RuleBook(this)
+    protected var ruleBook: RuleBook = RuleBook(this)
 
     //region GameStateVariables
     var wKingMoved = false
@@ -51,7 +51,7 @@ open class BoardStateManager(
     private var bRookBoard: ULong = 0x81u
     //endregion
 
-    private var boards = arrayOf(
+    protected var boards = arrayOf(
         wBishopBoard,
         wKingBoard,
         wKnightBoard,
@@ -66,7 +66,7 @@ open class BoardStateManager(
         bRookBoard
     )
 
-    fun initialize() {
+    open fun initialize() {
         boards = arrayOf(
             wBishopBoard,
             wKingBoard,
@@ -95,7 +95,7 @@ open class BoardStateManager(
 
         val pieceRule = ruleBook.getRules(chessPiece)
 
-        val possibleMoves = pieceRule.getPossibleMoves(
+        val possibleMoves = pieceRule.calcPossibleMoves(
             move.initialIndex, getBoardState(),
             getColorBoard(whiteTurn), getColorBoard(!whiteTurn))
 
@@ -357,7 +357,7 @@ open class BoardStateManager(
         return flipBits(empty, indices) and allyBoard
     }
 
-    fun isCheckMate(whiteTurn: Boolean): Boolean {
+    fun isCheckmate(whiteTurn: Boolean): Boolean {
         val kingBoard = getPieceBoard(if (whiteTurn) 1 else 7)
         val kingIndex = getBoardIndices(kingBoard)
 

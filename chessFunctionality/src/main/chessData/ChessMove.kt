@@ -20,8 +20,4 @@ data class ChessMove(
             targetIndex = toIndex(targetCoord)
         }
     }
-
-    fun assignChessPiece(piece: EPieceType) {
-        chessPiece = piece
-    }
 }

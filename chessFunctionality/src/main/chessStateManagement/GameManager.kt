@@ -39,7 +39,7 @@ open class GameManager(
             if (playerMove.first == EOutputType.Reset) startGameLoop()
 
             val check = bsm.isCheck(whiteTurn)
-            val checkMate = bsm.isCheckMate(whiteTurn)
+            val checkMate = bsm.isCheckmate(whiteTurn)
             renderer.renderBoard(
                 whiteTurn, check, checkMate,
                 bsm.getBoardState(), bsm.getPieceBoards()
