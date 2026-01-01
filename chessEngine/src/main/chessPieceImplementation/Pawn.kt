@@ -11,6 +11,7 @@ import chessData.MoveSet
 import chessPieceImplementation.baseImplementation.SingleStep
 import chessStateManagement.BoardStateManager
 import utils.isRank
+import utils.isWhite
 import utils.omniDirectional
 import kotlin.math.abs
 
@@ -39,6 +40,7 @@ class Pawn(private val bsm: BoardStateManager, piece: EPieceType) : SingleStep(p
         return super.canExecuteMove(move, board, allyBoard, enemyBoard, simulated)
     }
 
+    /*returns all squares that the pawn can move to*/
     fun getPush(index: Int, board: ULong): ULong {
         val singlePush = pushSingle(index)
         val doublePush = pushDouble(index)
@@ -58,7 +60,8 @@ class Pawn(private val bsm: BoardStateManager, piece: EPieceType) : SingleStep(p
 
     fun pushDouble(index: Int): ULong {
         var doublePush: ULong = empty
-        if (index in 8..15 || index in 48..55) {
+        if (isRank(2, index) && isWhite(piece)
+            || isRank(7, index) && !isWhite(piece)) {
             doublePush = flipBit(doublePush, index + mod * 16)
         }
         return doublePush

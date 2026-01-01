@@ -26,6 +26,7 @@ fun isRank(rank: Int, index: Int): Boolean {
     return index/8 + 1 == rank
 }
 
+/*returns indices of all marked bits in the bitboard*/
 fun getBoardIndices(board: ULong): Array<Int> {
     val indices: MutableList<Int> = mutableListOf()
 
@@ -41,6 +42,7 @@ fun isWhite(piece: EPieceType): Boolean {
     return piece.ordinal in 0..5
 }
 
+/*returns if the given index will overflow the file, jumping from A to H or vice versa*/
 fun willFileOverflow(current: Int, next: Int): Boolean {
     val currFile = current%8
     val nextFile = next%8

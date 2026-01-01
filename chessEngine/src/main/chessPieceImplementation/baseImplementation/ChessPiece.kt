@@ -19,10 +19,8 @@ open class ChessPiece(
         mod = if(piece.ordinal in 0..5) 1 else -1
     }
 
-    /*
-evaluates if the desired move can actually be executed
-rochade is for the king pieces
- */
+    /*evaluates if the desired move can actually be executed
+    rochade is for the king pieces */
     open fun canExecuteMove(move: ChessMove, board: ULong, allyBoard: ULong, enemyBoard: ULong, simulated: Boolean = false): Pair<Boolean, EMoveType?> {
         val realMoveSet = getPieceMoveSet(move.initialIndex, board, allyBoard, enemyBoard)
         if(simulated){
@@ -45,16 +43,12 @@ rochade is for the king pieces
         return Pair(false, null)
     }
 
-    /*
-returns actual possible moves and attacks that chess piece could execute
-*/
+    /*returns actual possible moves and attacks that chess piece could execute*/
     open fun getPieceMoveSet(index: Int, board: ULong, allyBoard: ULong, enemyBoard: ULong): MoveSet {
         return MoveSet(findMoves(index, board), findAttacks(index, allyBoard, enemyBoard))
     }
 
-    /*
-    finds all squares that the piece can step onto
-     */
+    /*finds all squares that the piece can step onto*/
     open fun findMoves(index: Int, board: ULong): ULong{
         var moves = empty
 
@@ -78,9 +72,7 @@ returns actual possible moves and attacks that chess piece could execute
         return moves
     }
 
-    /*
-    finds all enemy occupied squares that the piece attack
-     */
+    /*finds all enemy occupied squares that the piece attack*/
     open fun findAttacks(index: Int, allyBoard: ULong, enemyBoard: ULong): ULong{
         var attacks = empty
 
@@ -110,8 +102,8 @@ returns actual possible moves and attacks that chess piece could execute
     }
 
     /*
-    finds all squares that this piece could potentially reach and attack including the squares for the nearest allies
-    in each direction
+    returns all squares that this piece could potentially reach and attack including the squares of the nearest allies
+    in each direction (used for attack simulation)
      */
     open fun findAllPossibleAttacks(index: Int, board: ULong, allyBoard: ULong, enemyBoard: ULong): ULong{
         var attacks = empty

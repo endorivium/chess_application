@@ -142,6 +142,7 @@ open class BoardStateManager(
         boards[enemy.ordinal] = flipBit(boards[enemy.ordinal], move.targetIndex)
     }
 
+    /*simulate an attack with the given indices*/
     private fun simulateAtk(attacker: Int, target: Int): Boolean {
         val simulated = ChessMove(initialIndex = attacker, targetIndex = target)
         val chessPiece: EPieceType = getPieceAt(attacker)
@@ -154,12 +155,14 @@ open class BoardStateManager(
             empty, getColorBoard(!white), true).first
     }
 
+    /*deletes pawn and puts chosen chess piece on the corresponding board*/
     fun execPawnTransformation(move: ChessMove, transform: EPieceType){
         boards[move.chessPiece.ordinal] = flipBit(boards[move.chessPiece.ordinal], move.targetIndex)
         boards[transform.ordinal] = flipBit(boards[transform.ordinal], move.targetIndex)
         pawnTransform = false
     }
 
+    /*find possible squares that the chess piece at the given index (if there is one) can move to*/
     fun findPossibleMoves(move: ChessMove, whiteTurn: Boolean): Pair<EPieceType?, Array<Int>> {
         val chessPiece: EPieceType = getPieceAt(move.initialIndex, whiteTurn)
             ?: return Pair(null, emptyArray())
@@ -173,10 +176,12 @@ open class BoardStateManager(
         return Pair(chessPiece, getBoardIndices(possibleMoves.move))
     }
 
+    /*called from pawn chess piece to notify future execution of pawn transformation at end of move execution*/
     fun notifyPawnTransformation(){
         pawnTransform = true
     }
 
+    /*returns the current state of the board*/
     fun getBoardState(): ULong {
         var board: ULong = empty
 
@@ -186,20 +191,22 @@ open class BoardStateManager(
         return board
     }
 
-    fun getPieceAt(pieceIndex: Int, whiteTurn: Boolean): EPieceType? {
-        val pieceBit = flipBit(empty, pieceIndex)
+    /*returns the chess piece at the given index but only if it's the corresponding color*/
+    fun getPieceAt(index: Int, isWhite: Boolean): EPieceType? {
+        val pieceBit = flipBit(empty, index)
 
         for (i in boards.indices) {
             if ((pieceBit and boards[i]).countOneBits() >= 1) {
-                if (isWhite(EPieceType.fromInt(i)!!) == whiteTurn)
+                if (isWhite(EPieceType.fromInt(i)!!) == isWhite)
                     return EPieceType.fromInt(i)
             }
         }
         return null
     }
 
-    fun getPieceAt(pieceIndex: Int): EPieceType? {
-        val pieceBit = flipBit(empty, pieceIndex)
+    /*returns chess piece at the given index, color is irrelevant*/
+    fun getPieceAt(index: Int): EPieceType? {
+        val pieceBit = flipBit(empty, index)
 
         for (i in boards.indices) {
             if ((pieceBit and boards[i]).countOneBits() >= 1) {
@@ -209,6 +216,7 @@ open class BoardStateManager(
         return null
     }
 
+    /*return array of all chess piece bitboards*/
     fun getPieceBoards(): Array<ULong> {
         val pieceBoards = Array(12) { empty }
 
@@ -219,6 +227,7 @@ open class BoardStateManager(
         return pieceBoards
     }
 
+    /*returns the bitboard of the given chess piece*/
     fun getPieceBoard(piece: EPieceType): ULong {
         if (piece.ordinal !in boards.indices)
             throw IllegalStateException("$piece was not found in Board Set!")
@@ -226,6 +235,7 @@ open class BoardStateManager(
         return boards[piece.ordinal]
     }
 
+    /*overload of above, return bitboard via index*/
     fun getPieceBoard(index: Int): ULong {
         if (index !in boards.indices)
             throw IllegalArgumentException("$index was out of bounds for boards!")
@@ -233,9 +243,10 @@ open class BoardStateManager(
         return boards[index]
     }
 
-    fun getColorBoard(white: Boolean): ULong {
+    /*returns current board of the given color*/
+    fun getColorBoard(isWhite: Boolean): ULong {
         var board: ULong = empty
-        if (white) {
+        if (isWhite) {
             for (i in 0..5) {
                 board = board xor getPieceBoard(EPieceType.fromInt(i)!!)
             }
@@ -247,7 +258,7 @@ open class BoardStateManager(
         return board
     }
 
-
+    /*returns true if all squares in the given array are occupied by other pieces, irrelevant of their color*/
     fun areSquaresOccupied(indices: Array<Int>): Boolean {
         for (index in indices) {
             val square = flipBit(empty, index)
@@ -257,6 +268,7 @@ open class BoardStateManager(
         return false
     }
 
+    /*returns if the given square is threatened by any enemy pieces (done through simulation)*/
     fun isSquareThreatened(index: Int, isWPlayer: Boolean): Boolean {
         val enemyBoard = getColorBoard(!isWPlayer)
 
@@ -294,6 +306,7 @@ open class BoardStateManager(
         return false
     }
 
+    /*returns bitboard of all enemy threatened squares within the given indices array*/
     fun getThreatenedSquares(indices: Array<Int>, isWPlayer: Boolean): ULong {
         var threatened: ULong = empty
         for (index in indices) {
@@ -304,6 +317,7 @@ open class BoardStateManager(
         return threatened
     }
 
+    /*returns true if all squares are threatened by enemy pieces*/
     fun areSquaresThreatened(indices: Array<Int>, isWPlayer: Boolean): Boolean {
         for (index in indices) {
             if (isSquareThreatened(index, isWPlayer)) return true
@@ -311,6 +325,7 @@ open class BoardStateManager(
         return false
     }
 
+    /*checks if any kings or rooks have moved and flips boolean if true*/
     private fun checkKingRooksMoved(piece: EPieceType, index: Int) {
         when (piece) {
             EPieceType.BKing -> bKingMoved = true
@@ -325,12 +340,14 @@ open class BoardStateManager(
         }
     }
 
+    /*returns if King, left Rook, right Rook have moved dependent on asking color*/
     fun haveKingRooksMoved(isWPlayer: Boolean): Triple<Boolean, Boolean, Boolean> {
         if (isWPlayer)
             return Triple(wKingMoved, wLeftRookMoved, wRightRookMoved)
         return Triple(bKingMoved, bLeftRookMoved, bRightRookMoved)
     }
 
+    /*checks if the king of the current player is in check*/
     fun isCheck(whiteTurn: Boolean): Boolean {
         val kingBoard = getPieceBoard(if (whiteTurn) 1 else 7)
         val kingIndex = getBoardIndices(kingBoard)
@@ -342,6 +359,7 @@ open class BoardStateManager(
         return threatened
     }
 
+    /*checks if the king of the current player is in checkmate*/
     fun isCheckmate(whiteTurn: Boolean): Boolean {
         val kingBoard = getPieceBoard(if (whiteTurn) 1 else 7)
         val kingIndex = getBoardIndices(kingBoard)
@@ -360,6 +378,7 @@ open class BoardStateManager(
         return isCheck(whiteTurn) && availableSquares.countOneBits() == 0
     }
 
+    /*returns indices of squares surrounding the king at the given index*/
     fun getKingPerimeter(index: Int): Array<Int> {
         val perimeter = mutableListOf<Int>()
         for (step in omniDirectional) {
@@ -373,7 +392,7 @@ open class BoardStateManager(
         return perimeter.toTypedArray()
     }
 
-    //returns bitboard that has index spaces occupied by allies marked as 1
+    /*returns bitboard with all squares that are occupied by allies*/
     fun getAllyOccupiedSquares(indices: Array<Int>, isWPlayer: Boolean): ULong {
         val allyBoard = getColorBoard(isWPlayer)
         return flipBits(empty, indices) and allyBoard

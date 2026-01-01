@@ -2,6 +2,7 @@ package utils
 
 import java.lang.Character.toChars
 
+/*converts index to algebraic notation*/
 fun toAlgebraic(index: Int): String {
     val file = index % 8 + 65
     val rank = index / 8 + 49
@@ -16,6 +17,7 @@ fun toAlgebraic(index: Int): String {
     return (fileAlgebraic + rankAlgebraic).concatToString()
 }
 
+/*converts algebraic notation to index*/
 fun toIndex(algebraic: String): Int{
     val normed = algebraic.lowercase()
     if(normed.length != 2){
@@ -26,6 +28,7 @@ fun toIndex(algebraic: String): Int{
     return rank * 8 + file
 }
 
+/*checks if the given string is in algebraic notation*/
 fun isInAlgebraicNotation(input: String): Boolean {
     for(i in input.indices) {
         if(i%2 == 0){

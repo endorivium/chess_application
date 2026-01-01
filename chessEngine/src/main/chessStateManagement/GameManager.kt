@@ -23,10 +23,22 @@ open class GameManager(
         gameEnded = false
     }
 
+    /*starts and perpetuates the game loop until game win by either color, then asks for reset to play again*/
     fun startGameLoop() {
         initializeGame()
         var playerMove: Pair<EOutputType, ChessMove?>
+        renderer.renderBoard(
+            whiteTurn, check = false, checkMate = false,
+            board = bsm.getBoardState(), pieceBoards = bsm.getPieceBoards()
+        )
         while (!gameEnded) {
+            playerMove = inputHandler.readInput()
+
+            if (playerMove.first == EOutputType.Move) handleMove(playerMove.second)
+            if (playerMove.first == EOutputType.MoveCheck) handleMoveInquiry(playerMove.second)
+            if (playerMove.first == EOutputType.Demo) handleAutomatedMove(playerMove.second)
+            if (playerMove.first == EOutputType.Reset) startGameLoop()
+
             val check = bsm.isCheck(whiteTurn)
             val checkMate = bsm.isCheckmate(whiteTurn)
             gameEnded = checkMate
@@ -34,12 +46,6 @@ open class GameManager(
                 whiteTurn, check, checkMate,
                 bsm.getBoardState(), bsm.getPieceBoards()
             )
-            playerMove = inputHandler.readInput()
-
-            if (playerMove.first == EOutputType.Move) handleMove(playerMove.second)
-            if (playerMove.first == EOutputType.MoveCheck) handleMoveInquiry(playerMove.second)
-            if (playerMove.first == EOutputType.Demo) handleAutomatedMove(playerMove.second)
-            if (playerMove.first == EOutputType.Reset) startGameLoop()
         }
         //TODO("as if wants to play again via input handler")
         val playAgain = inputHandler.inquireReplay()
@@ -48,6 +54,7 @@ open class GameManager(
         }
     }
 
+    /*handles move output*/
     private fun handleMove(playerMove: ChessMove?) {
         if (playerMove == null) {
             println("Command could not be executed.")
@@ -57,11 +64,11 @@ open class GameManager(
         println("Registered Move: " + playerMove.initialCoord + "|" + playerMove.targetCoord)
 
         val execResult = bsm.execChessMove(playerMove, whiteTurn)
-        if (execResult.first) {
+        if (execResult.first) { //was the execution successful?
             giveOverTurn()
             println("Move was executed successfully!")
 
-            if(execResult.second != null) {
+            if(execResult.second != null) { //has a pawn reached the end of the chess board?
                 renderer.renderBoard(
                     whiteTurn, check = false, checkMate = false,
                     bsm.getBoardState(), bsm.getPieceBoards()
@@ -77,11 +84,13 @@ open class GameManager(
         }
     }
 
+    /*handles moves from the automated demo games*/
     private fun handleAutomatedMove(playerMove: ChessMove?) {
         if (playerMove == null) return
         handleMove(playerMove)
     }
 
+    /*handles player inquiry about the moveset of a chess piece on the given square*/
     private fun handleMoveInquiry(playerMove: ChessMove?) {
         if (playerMove == null) {
             println(
@@ -93,7 +102,7 @@ open class GameManager(
 
         val squares = bsm.findPossibleMoves(playerMove, whiteTurn)
 
-        if (squares.first == null) {
+        if (squares.first == null) { //is there a chess piece on the given square?
             println(
                 "Error! There is either no chess piece at " +
                         "${toAlgebraic(playerMove.initialIndex)} or it is not one of yours!"

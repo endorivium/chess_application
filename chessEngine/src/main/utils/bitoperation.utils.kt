@@ -2,15 +2,15 @@ package utils
 
 import kotlin.math.round
 
-//takes a ULong (64 bits) and a bitIndex and returns whether the bit at the given index is 0 or 1
-
 val empty: ULong = 0x0u
 val universe: ULong = 0xffffffffffffffffu
+
+/*returns the bit value at the given index from the given board*/
 fun getBit(b: ULong, bitIndex: Int): Boolean {
     //find how much bit must be shifted, so that looked at bit is least significant
     val shift: Int = 63 - bitIndex
     var bitLookup: ULong = b
-    //shift it right (max 31)
+    //shift it right (max index 31)
     bitLookup = bitLookup shr shift.coerceIn(0..31)
 
     //if shift is > 31, then it shifts the remaining indices left
@@ -23,6 +23,7 @@ fun getBit(b: ULong, bitIndex: Int): Boolean {
     return masked.toInt() != 0
 }
 
+/*flips the bit value in the given bitboard at the given indices and returns the new board*/
 fun flipBits(b: ULong = empty, indices: Array<Int>): ULong {
     var board = b
     for (index in indices) {
@@ -31,6 +32,7 @@ fun flipBits(b: ULong = empty, indices: Array<Int>): ULong {
     return board
 }
 
+/*flips the bit value in the bitboard at the given index and returns the new board*/
 fun flipBit(b: ULong = empty, bitIndex: Int): ULong {
     var board: ULong = b
     val longBitMask = makeLongBitMask(bitIndex)
@@ -40,25 +42,21 @@ fun flipBit(b: ULong = empty, bitIndex: Int): ULong {
     return board
 }
 
+/*swaps two bits in a bitboard*/
 fun swapBit(b: ULong, bitIndex: Int, targetIndex: Int): ULong {
     var board: ULong = b
     var longBitMask = makeLongBitMask(bitIndex).inv()
     board = board and longBitMask // Turn bit A off
-    //printBitDebug(longBitMask, "bit mask:")
-    //printBitDebug(board, "flipped bit:")
 
     longBitMask = makeLongBitMask(targetIndex)
     board = board or longBitMask  // Turn bit B on
-    //printBitDebug(longBitMask, "bit mask:") //debug
-    //printBitDebug(board, "swapped:") //debug
     return board
 }
 
+/*created a 64 bitmask with the bit turned on at the given index*/
 fun makeLongBitMask(bitIndex: Int): ULong {
     val shift: Int = 63 - bitIndex
     var bit = (1 shl shift.coerceIn(0..31)).toULong()
-    //printBitDebug(bit, "corrected:")
-    //printBitDebug(bit, "first shift:")
 
     //if shift is > 31, then it shifts the remaining indices left
     if (shift >= 31) {
@@ -66,22 +64,21 @@ fun makeLongBitMask(bitIndex: Int): ULong {
         val secondShift: Int = shift - 31
         bit = bit shl secondShift
     }
-    //printBitDebug(bit, "long bit mask:")
     return bit
 }
 
 /*
-conversion from Int to ULong fils the 32 most significant bits that were added with the sign bit leading to wrong
+conversion from Int to ULong fills the 32 most significant bits that were added with the sign bit, leading to wrong
 calculations within the bitboard
 this function fixes this by cancelling out the added sign bits
  */
 fun correctULongConversion(bit: ULong): ULong {
     val bitCorrection = bit shl 1
     val correctedBit = bit xor bitCorrection
-    //printBitDebug(bitCorrection, "bitCorrection: ")
     return correctedBit
 }
 
+/*for debugging, prints the given bitboard as a readable 8x8 board*/
 fun printBitDebug(bit: ULong, prefixTxt: String = "Initial Value:") {
     val numIndentation = round(40f / prefixTxt.length)
     var indentation = ""

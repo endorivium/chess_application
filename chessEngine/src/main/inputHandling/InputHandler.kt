@@ -30,6 +30,7 @@ class InputHandler(
         gameIndex = 0
     }
 
+    /*reads player input (if no automated game is running)*/
     fun readInput(): Pair<EOutputType, ChessMove?> {
         if (automated) {
             if (gameStep < automatedGame[gameIndex!!].lastIndex) {
@@ -49,6 +50,7 @@ class InputHandler(
         return handleInput(input)
     }
 
+    /*returns the type of input received and its chess move if there was one*/
     private fun handleInput(input: String): Pair<EOutputType, ChessMove?> {
         val normedInput = input.lowercase(getDefault())
 
@@ -83,6 +85,7 @@ class InputHandler(
         return EOutputType.None
     }
 
+    /*return chess move for inquiry about possible moveset for the given square index*/
     private fun handleCheckCmd(input: String): ChessMove? {
         val cleanedString = cleanString(keywords[1], input)
 
@@ -117,6 +120,7 @@ class InputHandler(
         return EOutputType.None
     }
 
+    /*toggles game automation and returns the first move of the chosen automated game*/
     private fun handleDemoCmd(input: String): ChessMove? {
         val cleanedString = cleanString(keywords[6], input)
         gameIndex = cleanedString.toIntOrNull()
@@ -128,6 +132,7 @@ class InputHandler(
         return handleMoveCmd(automatedGame[gameIndex!!][gameStep])
     }
 
+    /*extracts and returns chess move from input*/
     private fun handleMoveCmd(input: String): ChessMove? {
         val moveCoord = extractMove(input)
 
@@ -139,6 +144,7 @@ class InputHandler(
         return null
     }
 
+    /*cleans string and returns the found chess move (if it was valid)*/
     fun extractMove(input: String): Pair<Boolean, ChessMove?> {
         val cleanedString = cleanString(keywords[4], input)
 
@@ -153,7 +159,7 @@ class InputHandler(
         return Pair(false, null)
     }
 
-    //extracts the first keyword (such as 'help' or 'moves') from the given string
+    /*extracts the first keyword (such as 'help' or 'moves') from the given string*/
     fun extractKeyword(string: String): String {
         for (keyword in keywords) {
             if (string.contains(keyword)) {
@@ -163,6 +169,7 @@ class InputHandler(
         return ""
     }
 
+    /*cleans string of keywords and spaces*/
     fun cleanString(keyword: String = "", string: String): String {
         var cleanedString = string
         cleanedString = cleanedString.replace(keyword, "")
@@ -175,6 +182,7 @@ class InputHandler(
         return input.length == 4
     }
 
+    /*reads player input when pawn transformation is achieved*/
     fun inquirePawnTransform(piece: EPieceType): Int{
         println("$piece has reached board edge!")
         var chosen: Int? = null
