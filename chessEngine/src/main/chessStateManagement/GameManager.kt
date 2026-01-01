@@ -17,6 +17,7 @@ open class GameManager(
 
     private fun initializeGame() {
         inputHandler.initialize()
+        renderer.initialize()
         bsm.initialize()
         whiteTurn = true
         gameEnded = false
@@ -25,25 +26,20 @@ open class GameManager(
     fun startGameLoop() {
         initializeGame()
         var playerMove: Pair<EOutputType, ChessMove?>
-        renderer.renderBoard(
-            whiteTurn, check = false, checkMate = false,
-            bsm.getBoardState(), bsm.getPieceBoards()
-        )
         while (!gameEnded) {
+            val check = bsm.isCheck(whiteTurn)
+            val checkMate = bsm.isCheckmate(whiteTurn)
+            gameEnded = checkMate
+            renderer.renderBoard(
+                whiteTurn, check, checkMate,
+                bsm.getBoardState(), bsm.getPieceBoards()
+            )
             playerMove = inputHandler.readInput()
 
             if (playerMove.first == EOutputType.Move) handleMove(playerMove.second)
             if (playerMove.first == EOutputType.MoveCheck) handleMoveInquiry(playerMove.second)
             if (playerMove.first == EOutputType.Demo) handleAutomatedMove(playerMove.second)
             if (playerMove.first == EOutputType.Reset) startGameLoop()
-
-            val check = bsm.isCheck(whiteTurn)
-            val checkMate = bsm.isCheckmate(whiteTurn)
-            renderer.renderBoard(
-                whiteTurn, check, checkMate,
-                bsm.getBoardState(), bsm.getPieceBoards()
-            )
-            gameEnded = checkMate
         }
         //TODO("as if wants to play again via input handler")
         val playAgain = inputHandler.inquireReplay()
@@ -62,7 +58,7 @@ open class GameManager(
 
         val execResult = bsm.execChessMove(playerMove, whiteTurn)
         if (execResult.first) {
-            whiteTurn = !whiteTurn
+            giveOverTurn()
             println("Move was executed successfully!")
 
             if(execResult.second != null) {
@@ -106,5 +102,9 @@ open class GameManager(
         }
 
         renderer.printPossibleMoves(squares.first!!, playerMove.initialIndex, squares.second, whiteTurn)
+    }
+
+    private fun giveOverTurn(){
+        whiteTurn = !whiteTurn
     }
 }
