@@ -1,5 +1,6 @@
 package boardRendering
 
+/*universal board renderer that does not use unicode characters*/
 class CmdBoardRenderer: BoardRenderer() {
     override fun initialize() {
         pieceIcons = arrayOf(
