@@ -12,7 +12,6 @@ open class GameManager(
     private var renderer: BoardRenderer = BoardRenderer(),
     private var bsm: BoardStateManager = BoardStateManager()
 ) {
-
     private var whiteTurn = true
     private var gameEnded = false
 
@@ -47,12 +46,40 @@ open class GameManager(
             gameEnded = checkMate
         }
         //TODO("as if wants to play again via input handler")
-        val playAgain = inputHandler.playAgain()
+        val playAgain = inputHandler.inquireReplay()
         if (playAgain == EOutputType.Reset) {
             startGameLoop()
         }
     }
 
+    private fun handleMove(playerMove: ChessMove?) {
+        if (playerMove == null) {
+            println("Command could not be executed.")
+            return
+        }
+
+        println("Registered Move: " + playerMove.initialCoord + "|" + playerMove.targetCoord)
+
+        val execResult = bsm.execChessMove(playerMove, whiteTurn)
+        if (execResult.first) {
+            whiteTurn = !whiteTurn
+            println("Move was executed successfully!")
+
+            if(execResult.second != null) {
+                renderer.renderBoard(
+                    whiteTurn, check = false, checkMate = false,
+                    bsm.getBoardState(), bsm.getPieceBoards()
+                )
+
+                val chosenTransformIndex = inputHandler.inquirePawnTransform(execResult.second!!.chessPiece)
+                val chosenTransform = EPieceType.fromInt(chosenTransformIndex)
+                    ?: throw IllegalStateException("Index of chosen pawn transform was null when converting to EPieceType!")
+                bsm.execPawnTransformation(playerMove, chosenTransform)
+            }
+        } else {
+            println("Error! Move could not be executed. It is either not your turn or there was no chess piece on that square.")
+        }
+    }
 
     private fun handleAutomatedMove(playerMove: ChessMove?) {
         if (playerMove == null) return
@@ -79,34 +106,5 @@ open class GameManager(
         }
 
         renderer.printPossibleMoves(squares.first!!, playerMove.initialIndex, squares.second, whiteTurn)
-    }
-
-    private fun handleMove(playerMove: ChessMove?) {
-        if (playerMove == null) {
-            println("Command could not be executed.")
-            return
-        }
-
-        println("Registered Move: " + playerMove.initialCoord + "|" + playerMove.targetCoord)
-
-        val execResult = bsm.execChessMove(playerMove, whiteTurn)
-        if (execResult.first) {
-            whiteTurn = !whiteTurn
-            println("Move was executed successfully!")
-
-            if(execResult.second != null) {
-                renderer.renderBoard(
-                    whiteTurn, check = false, checkMate = false,
-                    bsm.getBoardState(), bsm.getPieceBoards()
-                )
-
-                val chosenTransformIndex = inputHandler.handlePawnTransform(execResult.second!!.chessPiece)
-                val chosenTransform = EPieceType.fromInt(chosenTransformIndex)
-                    ?: throw IllegalStateException("Index of chosen pawn transform was null when converting to EPieceType!")
-                bsm.execPawnTransformation(playerMove, chosenTransform)
-            }
-        } else {
-            println("Error! Move could not be executed. It is either not your turn or there was no chess piece on that square.")
-        }
     }
 }

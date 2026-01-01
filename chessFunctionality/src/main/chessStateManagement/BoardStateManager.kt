@@ -89,19 +89,6 @@ open class BoardStateManager(
         bRightRookMoved = false
     }
 
-    fun findPossibleMoves(move: ChessMove, whiteTurn: Boolean): Pair<EPieceType?, MutableList<Int>> {
-        val chessPiece: EPieceType = getPieceAt(move.initialIndex, whiteTurn)
-            ?: return Pair(null, mutableListOf())
-
-        val pieceRule = ruleBook.getRules(chessPiece)
-
-        val possibleMoves = pieceRule.calcPossibleMoves(
-            move.initialIndex, getBoardState(),
-            getColorBoard(whiteTurn), getColorBoard(!whiteTurn))
-
-        return Pair(chessPiece, getBoardIndices(possibleMoves.move))
-    }
-
     fun execChessMove(move: ChessMove, whiteTurn: Boolean): Pair<Boolean, ChessMove?> {
         move.chessPiece = getPieceAt(move.initialIndex, whiteTurn)
             ?: return Pair(false, null)
@@ -124,22 +111,8 @@ open class BoardStateManager(
         return Pair(false, null)
     }
 
-    fun execPawnTransformation(move: ChessMove, transform: EPieceType){
-        boards[move.chessPiece.ordinal] = flipBit(boards[move.chessPiece.ordinal], move.targetIndex)
-        boards[transform.ordinal] = flipBit(boards[transform.ordinal], move.targetIndex)
-        pawnTransform = false
-    }
-
     private fun execMove(piece: EPieceType, move: ChessMove) {
         boards[piece.ordinal] = swapBit(boards[piece.ordinal], move.initialIndex, move.targetIndex)
-    }
-
-    private fun execAttack(piece: EPieceType, move: ChessMove, whiteTurn: Boolean) {
-        val enemy = getPieceAt(move.targetIndex, !whiteTurn)
-            ?: throw IllegalStateException("There was no enemy to attack at " + move.targetIndex)
-
-        boards[piece.ordinal] = swapBit(boards[piece.ordinal], move.initialIndex, move.targetIndex)
-        boards[enemy.ordinal] = flipBit(boards[enemy.ordinal], move.targetIndex)
     }
 
     private fun execRochade(piece: EPieceType, move: ChessMove) {
@@ -159,6 +132,58 @@ open class BoardStateManager(
                 boards[11] = swapBit(boards[11], move.initialIndex - 4, move.targetIndex + 1)
             }
         }
+    }
+
+    private fun execAttack(piece: EPieceType, move: ChessMove, whiteTurn: Boolean) {
+        val enemy = getPieceAt(move.targetIndex, !whiteTurn)
+            ?: throw IllegalStateException("There was no enemy to attack at " + move.targetIndex)
+
+        boards[piece.ordinal] = swapBit(boards[piece.ordinal], move.initialIndex, move.targetIndex)
+        boards[enemy.ordinal] = flipBit(boards[enemy.ordinal], move.targetIndex)
+    }
+
+    private fun simulateAtk(attacker: Int, target: Int): Boolean {
+        val simulated = ChessMove(initialIndex = attacker, targetIndex = target)
+        val chessPiece: EPieceType = getPieceAt(attacker)
+            ?: throw IllegalArgumentException("Attacker should not be null!")
+
+        val pieceRule = ruleBook.getRules(chessPiece)
+
+        val white = isWhite(chessPiece)
+        return pieceRule.canExecuteMove(simulated, getBoardState(),
+            empty, getColorBoard(!white), true).first
+    }
+
+    fun execPawnTransformation(move: ChessMove, transform: EPieceType){
+        boards[move.chessPiece.ordinal] = flipBit(boards[move.chessPiece.ordinal], move.targetIndex)
+        boards[transform.ordinal] = flipBit(boards[transform.ordinal], move.targetIndex)
+        pawnTransform = false
+    }
+
+    fun findPossibleMoves(move: ChessMove, whiteTurn: Boolean): Pair<EPieceType?, Array<Int>> {
+        val chessPiece: EPieceType = getPieceAt(move.initialIndex, whiteTurn)
+            ?: return Pair(null, emptyArray())
+
+        val pieceRule = ruleBook.getRules(chessPiece)
+
+        val possibleMoves = pieceRule.getPieceMoveSet(
+            move.initialIndex, getBoardState(),
+            getColorBoard(whiteTurn), getColorBoard(!whiteTurn))
+
+        return Pair(chessPiece, getBoardIndices(possibleMoves.move))
+    }
+
+    fun notifyPawnTransformation(){
+        pawnTransform = true
+    }
+
+    fun getBoardState(): ULong {
+        var board: ULong = empty
+
+        for (piece in boards) {
+            board = board xor piece
+        }
+        return board
     }
 
     fun getPieceAt(pieceIndex: Int, whiteTurn: Boolean): EPieceType? {
@@ -182,6 +207,16 @@ open class BoardStateManager(
             }
         }
         return null
+    }
+
+    fun getPieceBoards(): Array<ULong> {
+        val pieceBoards = Array(12) { empty }
+
+        for (i in pieceBoards.indices) {
+            pieceBoards[i] = boards[i]
+        }
+
+        return pieceBoards
     }
 
     fun getPieceBoard(piece: EPieceType): ULong {
@@ -208,25 +243,6 @@ open class BoardStateManager(
             for (i in 6..11) {
                 board = board xor getPieceBoard(EPieceType.fromInt(i)!!)
             }
-        }
-        return board
-    }
-
-    fun getPieceBoards(): Array<ULong> {
-        val pieceBoards = Array(12) { empty }
-
-        for (i in pieceBoards.indices) {
-            pieceBoards[i] = boards[i]
-        }
-
-        return pieceBoards
-    }
-
-    fun getBoardState(): ULong {
-        var board: ULong = empty
-
-        for (piece in boards) {
-            board = board xor piece
         }
         return board
     }
@@ -278,13 +294,6 @@ open class BoardStateManager(
         return false
     }
 
-    fun areSquaresThreatened(indices: Array<Int>, isWPlayer: Boolean): Boolean {
-        for (index in indices) {
-            if (isSquareThreatened(index, isWPlayer)) return true
-        }
-        return false
-    }
-
     fun getThreatenedSquares(indices: Array<Int>, isWPlayer: Boolean): ULong {
         var threatened: ULong = empty
         for (index in indices) {
@@ -295,22 +304,11 @@ open class BoardStateManager(
         return threatened
     }
 
-    private fun simulateAtk(attacker: Int, target: Int): Boolean {
-        val simulated = ChessMove(initialIndex = attacker, targetIndex = target)
-        val chessPiece: EPieceType = getPieceAt(attacker)
-            ?: throw IllegalArgumentException("Attacker should not be null!")
-
-        val pieceRule = ruleBook.getRules(chessPiece)
-
-        val white = isWhite(chessPiece)
-        return pieceRule.canExecuteMove(simulated, getBoardState(),
-            getColorBoard(white), getColorBoard(!white), true).first
-    }
-
-    fun haveKingRooksMoved(isWPlayer: Boolean): Triple<Boolean, Boolean, Boolean> {
-        if (isWPlayer)
-            return Triple(wKingMoved, wLeftRookMoved, wRightRookMoved)
-        return Triple(bKingMoved, bLeftRookMoved, bRightRookMoved)
+    fun areSquaresThreatened(indices: Array<Int>, isWPlayer: Boolean): Boolean {
+        for (index in indices) {
+            if (isSquareThreatened(index, isWPlayer)) return true
+        }
+        return false
     }
 
     private fun checkKingRooksMoved(piece: EPieceType, index: Int) {
@@ -327,6 +325,12 @@ open class BoardStateManager(
         }
     }
 
+    fun haveKingRooksMoved(isWPlayer: Boolean): Triple<Boolean, Boolean, Boolean> {
+        if (isWPlayer)
+            return Triple(wKingMoved, wLeftRookMoved, wRightRookMoved)
+        return Triple(bKingMoved, bLeftRookMoved, bRightRookMoved)
+    }
+
     fun isCheck(whiteTurn: Boolean): Boolean {
         val kingBoard = getPieceBoard(if (whiteTurn) 1 else 7)
         val kingIndex = getBoardIndices(kingBoard)
@@ -336,6 +340,24 @@ open class BoardStateManager(
 
         val threatened = isSquareThreatened(kingIndex[0], whiteTurn)
         return threatened
+    }
+
+    fun isCheckmate(whiteTurn: Boolean): Boolean {
+        val kingBoard = getPieceBoard(if (whiteTurn) 1 else 7)
+        val kingIndex = getBoardIndices(kingBoard)
+
+        if (kingIndex.isEmpty() || kingIndex.size != 1)
+            throw IllegalStateException("There was either no or more than one King on the board!")
+
+        val kingPerimeter = getKingPerimeter(kingIndex[0])
+        val bitPerimeter = flipBits(empty, kingPerimeter)
+        val threatenedSquares = getThreatenedSquares(kingPerimeter, whiteTurn)
+        val occupied = getAllyOccupiedSquares(kingPerimeter, whiteTurn)
+
+        //finds all squares that are neither occupied nor threatened by enemy pieces
+        val availableSquares = (threatenedSquares xor occupied) xor bitPerimeter
+
+        return isCheck(whiteTurn) && availableSquares.countOneBits() == 0
     }
 
     fun getKingPerimeter(index: Int): Array<Int> {
@@ -357,24 +379,6 @@ open class BoardStateManager(
         return flipBits(empty, indices) and allyBoard
     }
 
-    fun isCheckmate(whiteTurn: Boolean): Boolean {
-        val kingBoard = getPieceBoard(if (whiteTurn) 1 else 7)
-        val kingIndex = getBoardIndices(kingBoard)
-
-        if (kingIndex.isEmpty() || kingIndex.size != 1)
-            throw IllegalStateException("There was either no or more than one King on the board!")
-
-        val kingPerimeter = getKingPerimeter(kingIndex[0])
-        val bitPerimeter = flipBits(empty, kingPerimeter)
-        val threatenedSquares = getThreatenedSquares(kingPerimeter, whiteTurn)
-        val occupied = getAllyOccupiedSquares(kingPerimeter, whiteTurn)
-
-        //finds all squares that are neither occupied nor threatened by enemy pieces
-        val availableSquares = (threatenedSquares xor occupied) xor bitPerimeter
-
-        return isCheck(whiteTurn) && availableSquares.countOneBits() == 0
-    }
-
     private fun recordMove(move: ChessMove){
         moveHistory.add(move)
     }
@@ -388,9 +392,5 @@ open class BoardStateManager(
             true,
             moveHistory[moveHistory.lastIndex]
         )
-    }
-
-    fun notifyPawnTransformation(){
-        pawnTransform = true
     }
 }

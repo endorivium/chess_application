@@ -102,7 +102,7 @@ class BoardRenderer() {
         }
     }
 
-    fun printPossibleMoves(chessPiece: EPieceType, index: Int, squares: MutableList<Int>, whiteTurn: Boolean) {
+    fun printPossibleMoves(chessPiece: EPieceType, index: Int, squares: Array<Int>, whiteTurn: Boolean) {
         if(squares.isEmpty()) {
             if(isWhite(chessPiece) == !whiteTurn) {
                 println("You cannot check moves of chess pieces that belong to the opposite color!")

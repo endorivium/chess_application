@@ -4,7 +4,8 @@ import kotlin.math.round
 
 //takes a ULong (64 bits) and a bitIndex and returns whether the bit at the given index is 0 or 1
 
-var empty: ULong = 0x0u
+val empty: ULong = 0x0u
+val universe: ULong = 0xffffffffffffffffu
 fun getBit(b: ULong, bitIndex: Int): Boolean {
     //find how much bit must be shifted, so that looked at bit is least significant
     val shift: Int = 63 - bitIndex

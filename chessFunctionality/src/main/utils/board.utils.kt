@@ -26,7 +26,7 @@ fun isRank(rank: Int, index: Int): Boolean {
     return index/8 + 1 == rank
 }
 
-fun getBoardIndices(board: ULong): MutableList<Int> {
+fun getBoardIndices(board: ULong): Array<Int> {
     val indices: MutableList<Int> = mutableListOf()
 
     for(i in 0..63){
@@ -34,7 +34,7 @@ fun getBoardIndices(board: ULong): MutableList<Int> {
             indices.add(i)
         }
     }
-    return indices
+    return indices.toTypedArray()
 }
 
 fun isWhite(piece: EPieceType): Boolean {

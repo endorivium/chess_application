@@ -4,18 +4,19 @@ import utils.empty
 import utils.flipBit
 import utils.isFile
 import utils.isWithinRanks
-import chessPieceImplementation.baseImplementation.ChessPiece
 import chessData.ChessMove
 import chessData.EMoveType
 import chessData.EPieceType
 import chessData.MoveSet
+import chessPieceImplementation.baseImplementation.SingleStep
 import chessStateManagement.BoardStateManager
 import utils.isRank
+import utils.omniDirectional
 import kotlin.math.abs
 
-class Pawn(private val bsm: BoardStateManager, piece: EPieceType) : ChessPiece(piece = piece) {
+class Pawn(private val bsm: BoardStateManager, piece: EPieceType) : SingleStep(piece = piece, omniDirectional) {
 
-    override fun calcPossibleMoves(index: Int, board: ULong, allyBoard: ULong, enemyBoard: ULong): MoveSet {
+    override fun getPieceMoveSet(index: Int, board: ULong, allyBoard: ULong, enemyBoard: ULong): MoveSet {
         val push = getPush(index, board)
         val attack = getAttack(index, enemyBoard)
         val possibleMoves: ULong = (push xor board) and push
@@ -47,6 +48,22 @@ class Pawn(private val bsm: BoardStateManager, piece: EPieceType) : ChessPiece(p
         return forwardMoves
     }
 
+    fun pushSingle(index: Int): ULong {
+        var singlePush: ULong = empty
+        if (isWithinRanks(index, 2, 7)) {
+            singlePush = singlePush xor flipBit(singlePush, index + mod * 8)
+        }
+        return singlePush
+    }
+
+    fun pushDouble(index: Int): ULong {
+        var doublePush: ULong = empty
+        if (index in 8..15 || index in 48..55) {
+            doublePush = flipBit(doublePush, index + mod * 16)
+        }
+        return doublePush
+    }
+
     fun getAttack(index: Int, enemyBoard: ULong): ULong {
         var leftAttack: ULong = empty
         if (index % 8 != 0 && index in 8..55) {
@@ -62,6 +79,12 @@ class Pawn(private val bsm: BoardStateManager, piece: EPieceType) : ChessPiece(p
 
         val attack: ULong = leftAttack xor rightAttack xor enPassantMove(index)
         return attack
+    }
+
+    fun enPassantMove(index: Int): ULong {
+        val prevMove = bsm.getPrevMove()
+        if (!prevMove.first) return empty
+        return leftEnPassant(index, prevMove.second) xor rightEnPassant(index, prevMove.second)
     }
 
     fun leftEnPassant(index: Int, prevMove: ChessMove): ULong {
@@ -90,32 +113,8 @@ class Pawn(private val bsm: BoardStateManager, piece: EPieceType) : ChessPiece(p
         return empty
     }
 
-    fun enPassantMove(index: Int): ULong {
-        val prevMove = bsm.getPrevMove()
-        if (!prevMove.first) return empty
-        return leftEnPassant(index, prevMove.second) xor rightEnPassant(index, prevMove.second)
-    }
-
     fun getEnemyPawn(): EPieceType {
         return if (piece == EPieceType.BPawn) EPieceType.WPawn else EPieceType.BPawn
-    }
-
-    fun pushSingle(index: Int): ULong {
-        var singlePush: ULong = empty
-        if (isWithinRanks(index, 2, 7)) {
-            singlePush = singlePush xor flipBit(singlePush, index + mod * 8)
-        }
-        //printBitDebug(singlePush, "pushSingle: ")
-        return singlePush
-    }
-
-    fun pushDouble(index: Int): ULong {
-        var doublePush: ULong = empty
-        if (index in 8..15 || index in 48..55) {
-            doublePush = flipBit(doublePush, index + mod * 16)
-        }
-        //printBitDebug(doublePush, "pushDouble: ")
-        return doublePush
     }
 
     fun notifyTransformation() {
