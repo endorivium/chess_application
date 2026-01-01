@@ -34,21 +34,21 @@ open class BoardStateManager(
     //endregion
 
     //region BlackBoard
-    private var wBishopBoard: ULong = 0x2400000000000000u
-    private var wKingBoard: ULong = 0x800000000000000u
-    private var wKnightBoard: ULong = 0x4200000000000000u
-    private var wPawnBoard: ULong = 0xFF000000000000u
-    private var wQueenBoard: ULong = 0x1000000000000000u
-    private var wRookBoard: ULong = 0x8100000000000000u
+    private val wBishopBoard: ULong = 0x2400000000000000u
+    private val wKingBoard: ULong = 0x800000000000000u
+    private val wKnightBoard: ULong = 0x4200000000000000u
+    private val wPawnBoard: ULong = 0xFF000000000000u
+    private val wQueenBoard: ULong = 0x1000000000000000u
+    private val wRookBoard: ULong = 0x8100000000000000u
     //endregion
 
     //region WhiteBoard
-    private var bBishopBoard: ULong = 0x24u
-    private var bKingBoard: ULong = 0x8u
-    private var bKnightBoard: ULong = 0x42u
-    private var bPawnBoard: ULong = 0xFF00u
-    private var bQueenBoard: ULong = 0x10u
-    private var bRookBoard: ULong = 0x81u
+    private val bBishopBoard: ULong = 0x24u
+    private val bKingBoard: ULong = 0x8u
+    private val bKnightBoard: ULong = 0x42u
+    private val bPawnBoard: ULong = 0xFF00u
+    private val bQueenBoard: ULong = 0x10u
+    private val bRookBoard: ULong = 0x81u
     //endregion
 
     protected var boards = arrayOf(
