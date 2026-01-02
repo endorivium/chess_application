@@ -35,9 +35,12 @@ func (gs *GameState) StartGameLoop() {
 		gs.boardState.GetBoardState(), gs.boardState.GetPieceBoards())
 	for !gs.GameEnded {
 		output, playerMove := gs.inputParser.Read()
-
 		if output {
 			gs.handleMove(playerMove)
+		} else {
+			println("Error! Move could not be executed. " +
+				"Make sure to format your input in algebraic notation ([move][move])" +
+				" without any additional words, e.g. f2 f3 ")
 		}
 
 		var check = gs.boardState.isCheck(gs.WhiteTurn)
@@ -63,7 +66,7 @@ func (gs *GameState) handleMove(playerMove data.ChessMove) {
 		gs.giveOverTurn()
 		println("Move was executed successfully!")
 	} else {
-		println("Error! Move could not be executed. It is either not your turn or there was no chess piece on that square.")
+		println("Error! Move could not be executed.")
 	}
 }
 
