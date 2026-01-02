@@ -405,4 +405,11 @@ open class BoardStateManager(
         }
         return false
     }
+
+    /*returns if King, left Rook, right Rook have moved dependent on asking color*/
+    fun haveKingRooksMoved(isWPlayer: Boolean): Triple<Boolean, Boolean, Boolean> {
+        if (isWPlayer)
+            return Triple(wKingMoved, wLeftRookMoved, wRightRookMoved)
+        return Triple(bKingMoved, bLeftRookMoved, bRightRookMoved)
+    }
 }
