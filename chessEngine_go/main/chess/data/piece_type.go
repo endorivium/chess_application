@@ -15,7 +15,6 @@ const (
 	BPawn
 	BQueen
 	BRook
-	None
 )
 
 var pieceName = map[PieceType]string{
@@ -31,7 +30,6 @@ var pieceName = map[PieceType]string{
 	BPawn:   "Black Pawn",
 	BQueen:  "Black Queen",
 	BRook:   "Black Rook",
-	None:    "No Piece",
 }
 
 func (pt PieceType) String() string {
