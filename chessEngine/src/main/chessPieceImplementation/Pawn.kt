@@ -69,13 +69,13 @@ class Pawn(private val bsm: BoardStateManager, piece: EPieceType) : SingleStep(p
 
     fun getAttack(index: Int, enemyBoard: ULong): ULong {
         var leftAttack: ULong = empty
-        if (index % 8 != 0 && index in 8..55) {
+        if (!isFile('A', index) && isWithinRanks(index, 2, 7)) {
             leftAttack = flipBit(bitIndex = index + mod * 7)
         }
         leftAttack = leftAttack and enemyBoard
 
         var rightAttack: ULong = empty
-        if (index % 7 != 0 && index in 8..55) {
+        if (!isFile('H', index) && isWithinRanks(index, 2, 7)) {
             rightAttack = flipBit(bitIndex = index + mod * 9)
         }
         rightAttack = rightAttack and enemyBoard
