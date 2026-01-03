@@ -12,7 +12,7 @@ import utils.universe
 
 open class ChessPiece(
     val piece: EPieceType = EPieceType.WPawn,
-    val movePattern: Array<Int> = emptyArray(),
+    val movePattern: Array<Int>,
     protected var mod: Int = 0){
 
     init{

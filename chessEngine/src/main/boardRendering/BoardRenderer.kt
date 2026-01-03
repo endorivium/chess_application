@@ -103,7 +103,7 @@ open class BoardRenderer() {
                     "\uFF23\uFF28\uFF25\uFF23\uFF2B\uFF2D\uFF21\uFF34\uFF25\uFF01" +
                     "  \uFF1D\uFF1D "
         )
-        if (whiteTurn) {
+        if (!whiteTurn) {
             print(
                 "\n      \uFF1D\uFF1D  " +
                         "\uFF37\uFF28\uFF29\uFF34\uFF25 \uFF37\uFF29\uFF2E\uFF33\uFF01" +

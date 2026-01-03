@@ -1,10 +1,11 @@
 import chessData.EPieceType
-import chessPieceImplementation.Queen
+import chessPieceImplementation.baseImplementation.ChessPiece
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
+import utils.omniDirectional
 
-class QueenTest {
-private val omniStep = Queen(EPieceType.WQueen)
+class ChessPieceTest {
+private val omniStep = ChessPiece(EPieceType.WQueen, omniDirectional)
 
     @Test
     fun `findMoves returns all possible moves that an infinite omnidirectional piece can execute (G4, default board)`(){

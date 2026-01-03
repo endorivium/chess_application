@@ -68,7 +68,7 @@ class CmdBoardRenderer: BoardRenderer() {
                     "CHECKMATE!" +
                     "  =============\n"
         )
-        if (whiteTurn) {
+        if (!whiteTurn) {
             print(
                 "    =============  " +
                         "BLACK WINS!" +
