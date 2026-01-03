@@ -30,7 +30,7 @@ open class BoardStateManager(
     var bLeftRookMoved = false
     var bRightRookMoved = false
 
-    var pawnTransform = false
+    var pawnPromotion = false
     //endregion
 
     //region BlackBoard
@@ -108,7 +108,7 @@ open class BoardStateManager(
 
             checkKingRooksMoved(move.chessPiece, move.initialIndex)
             recordMove(move)
-            return Pair(true, if (pawnTransform) move else null)
+            return Pair(true, if (pawnPromotion) move else null)
         }
         return Pair(false, null)
     }
@@ -221,15 +221,15 @@ open class BoardStateManager(
     }
 
     /*called from pawn chess piece to notify future execution of pawn transformation at end of move execution*/
-    fun notifyPawnTransformation() {
-        pawnTransform = true
+    fun notifyPawnPromotion() {
+        pawnPromotion = true
     }
 
     /*deletes pawn and puts chosen chess piece on the corresponding board*/
-    fun execPawnTransformation(move: ChessMove, transform: EPieceType) {
+    fun execPawnPromotion(move: ChessMove, transform: EPieceType) {
         boards[move.chessPiece.ordinal] = flipBit(boards[move.chessPiece.ordinal], move.targetIndex)
         boards[transform.ordinal] = flipBit(boards[transform.ordinal], move.targetIndex)
-        pawnTransform = false
+        pawnPromotion = false
     }
 
     /*checks if the king of the current player is in checkmate*/

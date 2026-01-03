@@ -12,7 +12,6 @@ import chessPieceImplementation.baseImplementation.SingleStep
 import chessStateManagement.BoardStateManager
 import utils.isRank
 import utils.isWhite
-import utils.omniDirectional
 import utils.pawnAttackPattern
 import kotlin.math.abs
 
@@ -35,7 +34,7 @@ class Pawn(private val bsm: BoardStateManager, piece: EPieceType) : SingleStep(p
     ): Pair<Boolean, EMoveType?> {
         if (!simulated) {
             if (isRank(1, move.targetIndex) || isRank(8, move.targetIndex)) {
-                notifyTransformation()
+                notifyPromotion()
             }
         }
         return super.canExecuteMove(move, board, allyBoard, enemyBoard, simulated)
@@ -122,7 +121,7 @@ class Pawn(private val bsm: BoardStateManager, piece: EPieceType) : SingleStep(p
         return if (piece == EPieceType.BPawn) EPieceType.WPawn else EPieceType.BPawn
     }
 
-    private fun notifyTransformation() {
-        bsm.notifyPawnTransformation()
+    private fun notifyPromotion() {
+        bsm.notifyPawnPromotion()
     }
 }

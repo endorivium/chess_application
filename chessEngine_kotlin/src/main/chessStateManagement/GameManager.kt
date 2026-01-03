@@ -76,7 +76,7 @@ open class GameManager(
                 val chosenTransformIndex = inputHandler.inquirePawnTransform(execResult.second!!.chessPiece)
                 val chosenTransform = EPieceType.fromInt(chosenTransformIndex)
                     ?: throw IllegalStateException("Index of chosen pawn transform was null when converting to EPieceType!")
-                bsm.execPawnTransformation(playerMove, chosenTransform)
+                bsm.execPawnPromotion(playerMove, chosenTransform)
             }
         } else {
             println("Error! Move could not be executed. It is either not your turn or there was no chess piece on that square.")

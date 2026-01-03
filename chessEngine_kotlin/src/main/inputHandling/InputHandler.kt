@@ -187,7 +187,7 @@ class InputHandler(
         println("$piece has reached board edge!")
         var chosen: Int? = null
         while(chosen == null) {
-            print("Please choose a chess piece by typing its corresponding number:\n" +
+            print("Please choose which chess piece it should promote to by typing its corresponding number:\n" +
                     "> 0: Bishop\n" +
                     "> 1: Knight\n" +
                     "> 2: Queen\n" +
@@ -203,7 +203,7 @@ class InputHandler(
                 print("Input was not valid. ")
             } else {
                 val isWPlayer = isWhite(piece)
-                println("\nTransforming pawn into chosen piece!")
+                println("\nPromoting pawn to chosen piece!")
                 return when(chosen){
                     0 -> if(isWPlayer) 0 else 6
                     1 -> if(isWPlayer) 2 else 8
