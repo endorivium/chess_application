@@ -7,6 +7,7 @@ class BoardRendererTest {
 
     @Test
     fun `refreshRendering returns string array (size = 8) configured per chess board rank`() {
+        renderer.initialize()
         val mockBoard = 0xff01000000000000u
         val mockPieceBoards = arrayOf(
             0x2400000000000000u, 0x1000000000000000u, 0x4200000000000000u,
