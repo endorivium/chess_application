@@ -37,8 +37,6 @@ fun flipBit(b: ULong = empty, bitIndex: Int): ULong {
     var board: ULong = b
     val longBitMask = makeLongBitMask(bitIndex)
     board = board xor longBitMask  // Turn bit B on
-    //printBitDebug( longBitMask, "bit mask:") //debug
-    //printBitDebug(board, "set bit:") //debug
     return board
 }
 

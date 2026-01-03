@@ -47,7 +47,6 @@ open class GameManager(
                 bsm.getBoardState(), bsm.getPieceBoards()
             )
         }
-        //TODO("as if wants to play again via input handler")
         val playAgain = inputHandler.inquireReplay()
         if (playAgain == EOutputType.Reset) {
             startGameLoop()
