@@ -1,10 +1,11 @@
 package input
 
 import (
-	"chessEngine_go/chess/data"
-	"chessEngine_go/utils/algebraic"
 	"fmt"
 	"strings"
+
+	"main.go/chess/data"
+	"main.go/utils/algebraic"
 )
 
 type Parser struct {
@@ -20,10 +21,7 @@ func NewParser() *Parser {
 	var automatedGame = [][]string{
 		{"f2f3", "e7e6", "g2g4", "d8h4"},
 		{"e2e3", "f7f6", "g1h3", "g7g5", "d1h5"},
-		//{"e2e3", "b8a6", "a2a3", "d7d6", "b2b3", "c8e6", "c2c3", "d8d7", "d2d3", "e8c8"},
-		//{"g2g3", "a7a6", "f1h3", "b7b6", "g1f3", "c7c6", "e1g1"},
-		//{"d2d4", "a7a6", "d4d5", "c7c5", "d5c5"},
-		//{"f2f4", "g8h6", "f4f5", "g7g5", "f5g5", "b8c6", "g5g6", "a7a6", "g6g7", "d7d5", "g7g8"},
+		{"a2a3", "g8h6", "b1c3", "e7e5", "e2e4", "d8g5", "d2d3", "g5c1", "a3a4", "c1d1", "e1d1", "f8a3", "a1c1"},
 	}
 	return &Parser{automatedGame: automatedGame}
 }
@@ -44,11 +42,12 @@ func (p *Parser) Read() (bool, data.ChessMove) {
 			p.automated = false
 			p.gameStep = 0
 			p.gameIndex = 0
-			println("Run of Demo complete. Please reset the game by typing 'reset'.")
+			println("Run of Demo complete. Please close the program or continue from current board state.")
 		}
 	}
 
-	println("Please input a chess movement in algebraic notation: ")
+	println("The command will only be registered if there is a space between the two inputs." +
+		" Please input a chess movement in algebraic notation (eg. f2 f3): ")
 	print("> ")
 	var initial, target string
 
@@ -76,7 +75,7 @@ func (p *Parser) handleInput(initial string, target string) (bool, data.ChessMov
 	return false, data.NewInvalidMove()
 }
 
-/*toggles game automation and returns the first move of the chosen automated game*/
+/*handleDemoCmd toggles game automation and returns the first move of the chosen automated game*/
 func (p *Parser) handleDemoCmd(input string) (bool, data.ChessMove) {
 	p.gameIndex = int(input[0] - '0')
 	if p.gameIndex >= len(p.automatedGame) {
@@ -88,7 +87,7 @@ func (p *Parser) handleDemoCmd(input string) (bool, data.ChessMove) {
 	return true, *data.NewChessMove(nextMove[0], nextMove[1])
 }
 
-/*extracts the first keyword (such as 'help' or 'moves') from the given string*/
+/*extractKeyword extracts the first keyword (such as 'help' or 'moves') from the given string*/
 func (p *Parser) extractKeyword(input string) string {
 	for _, keyword := range p.keywords {
 		if strings.Contains(input, keyword) {
@@ -96,8 +95,4 @@ func (p *Parser) extractKeyword(input string) string {
 		}
 	}
 	return ""
-}
-
-func isMoveInputValid(input string) bool {
-	return len(input) == 4
 }

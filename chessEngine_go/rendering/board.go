@@ -1,8 +1,8 @@
 package rendering
 
 import (
-	"chessEngine_go/utils/bit"
-	"chessEngine_go/utils/chessboard"
+	"main.go/utils/bit"
+	"main.go/utils/chessboard"
 )
 
 type BoardRendering struct {

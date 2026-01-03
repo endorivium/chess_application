@@ -1,9 +1,10 @@
 package chessboard
 
 import (
-	"chessEngine_go/chess/data"
-	"chessEngine_go/utils/bit"
 	"unicode"
+
+	"main.go/chess/data"
+	"main.go/utils/bit"
 )
 
 var OmniDirectional = []int{7, 8, 9, -1, 1, -9, -8, -7}

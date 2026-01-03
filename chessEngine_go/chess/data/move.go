@@ -1,8 +1,9 @@
 package data
 
 import (
-	"chessEngine_go/utils/algebraic"
 	"strconv"
+
+	"main.go/utils/algebraic"
 )
 
 type ChessMove struct {

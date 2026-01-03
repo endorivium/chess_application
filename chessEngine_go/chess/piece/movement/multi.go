@@ -1,11 +1,12 @@
 package movement
 
 import (
-	"chessEngine_go/chess/data"
-	"chessEngine_go/chess/piece"
-	"chessEngine_go/utils/bit"
-	"chessEngine_go/utils/chessboard"
 	"math/bits"
+
+	"main.go/chess/data"
+	"main.go/chess/piece"
+	"main.go/utils/bit"
+	"main.go/utils/chessboard"
 )
 
 type Multi struct {
@@ -29,10 +30,6 @@ func (m *Multi) CanExecuteMove(move data.ChessMove, board uint64, allies uint64,
 
 	if bits.OnesCount64(realMoveSet.Attack&desiredMove) >= 1 {
 		return true, piece.Attack
-	}
-
-	if bits.OnesCount64(realMoveSet.Rochade&desiredMove) >= 1 {
-		return true, piece.Rochade
 	}
 
 	return false, piece.Move

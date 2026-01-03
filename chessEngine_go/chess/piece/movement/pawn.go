@@ -1,11 +1,12 @@
 package movement
 
 import (
-	"chessEngine_go/chess/data"
-	"chessEngine_go/chess/piece"
-	"chessEngine_go/utils/bit"
-	"chessEngine_go/utils/chessboard"
 	"math/bits"
+
+	"main.go/chess/data"
+	"main.go/chess/piece"
+	"main.go/utils/bit"
+	"main.go/utils/chessboard"
 )
 
 type Pawn struct {
@@ -13,9 +14,9 @@ type Pawn struct {
 	mod   int
 }
 
-func NewPawn(pieceType data.PieceType, pattern []int) *Pawn {
+func NewPawn(pieceType data.PieceType) *Pawn {
 	var isWhite = chessboard.IsWhite(pieceType)
-	var newPawn = Pawn{Piece: *data.NewPiece(pieceType, pattern)}
+	var newPawn = Pawn{Piece: *data.NewPiece(pieceType, chessboard.OmniDirectional)}
 	if isWhite {
 		newPawn.mod = 1
 	} else {
@@ -37,10 +38,6 @@ func (p *Pawn) CanExecuteMove(move data.ChessMove, board uint64, allies uint64, 
 
 	if bits.OnesCount64(realMoveSet.Attack&desiredMove) >= 1 {
 		return true, piece.Attack
-	}
-
-	if bits.OnesCount64(realMoveSet.Rochade&desiredMove) >= 1 {
-		return true, piece.Rochade
 	}
 
 	return false, piece.Move
@@ -109,64 +106,3 @@ func (p *Pawn) pushDouble(index int) uint64 {
 	}
 	return doublePush
 }
-
-//
-//func (p *Pawn) enPassantMove(index int) uint64 {
-//	var ok, prevMove = p.boardState.GetPrevMove()
-//	if !ok {
-//		return bit.Empty
-//	}
-//
-//	return p.leftEnPassant(index, prevMove) ^ p.rightEnPassant(index, prevMove)
-//}
-//
-//func (p *Pawn) leftEnPassant(index int, prevMove data.ChessMove) uint64 {
-//	var stepDist = chessboard.Abs(prevMove.Initial/8 - prevMove.Target/8)
-//
-//	var enPassantIndexLeft int
-//	if !chessboard.IsFile('A', index) {
-//		enPassantIndexLeft = index - 1
-//	} else {
-//		enPassantIndexLeft = -1
-//	}
-//
-//	if stepDist != 2 || enPassantIndexLeft == -1 {
-//		return bit.Empty
-//	}
-//
-//	if prevMove.Piece == p.getEnemyPawn() && prevMove.Target == enPassantIndexLeft {
-//		return bit.FlipBit(bit.Empty, enPassantIndexLeft)
-//	}
-//	return bit.Empty
-//}
-//
-//func (p *Pawn) rightEnPassant(index int, prevMove data.ChessMove) uint64 {
-//	var stepDist = chessboard.Abs(prevMove.Initial/8 - prevMove.Target/8)
-//	var enPassantIndexRight int
-//	if !chessboard.IsFile('H', index) {
-//		enPassantIndexRight = index + 1
-//	} else {
-//		enPassantIndexRight = -1
-//	}
-//
-//	if stepDist != 2 || enPassantIndexRight == -1 {
-//		return bit.Empty
-//	}
-//
-//	if prevMove.Piece == p.getEnemyPawn() && prevMove.Target == enPassantIndexRight {
-//		return bit.FlipBit(bit.Empty, enPassantIndexRight)
-//	}
-//	return bit.Empty
-//}
-
-func (p *Pawn) getEnemyPawn() data.PieceType {
-	if p.Piece.Type == data.BPawn {
-		return data.WPawn
-	} else {
-		return data.BPawn
-	}
-}
-
-//func (p *Pawn) notifyTransformation() {
-//	p.boardState.NotifyPawnTransformation()
-//}

@@ -1,9 +1,9 @@
 package state
 
 import (
-	"chessEngine_go/chess/data"
-	"chessEngine_go/input"
-	"chessEngine_go/rendering"
+	"main.go/chess/data"
+	"main.go/input"
+	"main.go/rendering"
 )
 
 type GameState struct {
@@ -39,12 +39,12 @@ func (gs *GameState) StartGameLoop() {
 			gs.handleMove(playerMove)
 		} else {
 			println("Error! Move could not be executed. " +
-				"Make sure to format your input in algebraic notation ([move][move])" +
-				" without any additional words, e.g. f2 f3 ")
+				"Make sure to format your input in algebraic notation ([move]space[move])" +
+				" including the space and without any additional words, e.g. f2 f3 ")
 		}
 
-		var check = gs.boardState.isCheck(gs.WhiteTurn)
-		var checkMate = gs.boardState.isCheckmate(gs.WhiteTurn)
+		var check = gs.boardState.IsCheck(gs.WhiteTurn)
+		var checkMate = gs.boardState.IsCheckmate(gs.WhiteTurn)
 		gs.GameEnded = checkMate
 		gs.renderer.RenderBoard(
 			gs.WhiteTurn, check, checkMate,
