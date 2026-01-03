@@ -1,6 +1,7 @@
 package chessStateManagement
 
 import boardRendering.BoardRenderer
+import boardRendering.CmdBoardRenderer
 import utils.toAlgebraic
 import chessData.ChessMove
 import chessData.EPieceType
@@ -9,7 +10,7 @@ import inputHandling.InputHandler
 
 open class GameManager(
     private var inputHandler: InputHandler = InputHandler(),
-    private var renderer: BoardRenderer = BoardRenderer(),
+    private var renderer: CmdBoardRenderer = CmdBoardRenderer(),
     private var bsm: BoardStateManager = BoardStateManager()
 ) {
     private var whiteTurn = true

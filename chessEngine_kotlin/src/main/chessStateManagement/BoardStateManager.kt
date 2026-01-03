@@ -103,7 +103,7 @@ open class BoardStateManager(
             when (moveExec.second!!) {
                 EMoveType.Move -> execMove(move.chessPiece, move)
                 EMoveType.Attack -> execAttack(move.chessPiece, move, whiteTurn)
-                else -> execRochade(move.chessPiece, move)
+                else -> execCastle(move.chessPiece, move)
             }
 
             checkKingRooksMoved(move.chessPiece, move.initialIndex)
@@ -182,17 +182,17 @@ open class BoardStateManager(
         boards[enemy.ordinal] = flipBit(boards[enemy.ordinal], move.targetIndex)
     }
 
-    private fun execRochade(piece: EPieceType, move: ChessMove) {
+    private fun execCastle(piece: EPieceType, move: ChessMove) {
         boards[piece.ordinal] = swapBit(boards[piece.ordinal], move.initialIndex, move.targetIndex)
 
-        //short rochade (moving right)
+        //short castle (moving right)
         if (move.initialIndex < move.targetIndex) {
             if (isWhite(piece)) {
                 boards[5] = swapBit(boards[5], move.initialIndex + 3, move.targetIndex - 1)
             } else {
                 boards[11] = swapBit(boards[11], move.initialIndex + 3, move.targetIndex - 1)
             }
-        } else { //long rochade (moving left)
+        } else { //long castle (moving left)
             if (isWhite(piece)) {
                 boards[5] = swapBit(boards[5], move.initialIndex - 4, move.targetIndex + 1)
             } else {

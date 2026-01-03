@@ -20,7 +20,7 @@ open class ChessPiece(
     }
 
     /*evaluates if the desired move can actually be executed
-    rochade is for the king pieces */
+    castle is for the king pieces */
     open fun canExecuteMove(move: ChessMove, board: ULong, allyBoard: ULong, enemyBoard: ULong, simulated: Boolean = false): Pair<Boolean, EMoveType?> {
         val realMoveSet = getPieceMoveSet(move.initialIndex, board, allyBoard, enemyBoard)
         if(simulated){
@@ -36,8 +36,8 @@ open class ChessPiece(
             return Pair(true, EMoveType.Attack)
         }
 
-        if((realMoveSet.rochade and desiredMove).countOneBits() >= 1){
-            return Pair(true, EMoveType.Rochade)
+        if((realMoveSet.castle and desiredMove).countOneBits() >= 1){
+            return Pair(true, EMoveType.Castle)
         }
 
         return Pair(false, null)

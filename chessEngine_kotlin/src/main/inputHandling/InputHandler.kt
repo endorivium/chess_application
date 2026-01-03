@@ -112,8 +112,8 @@ class InputHandler(
             "The following (semi-nonsense) chess demos are preprogrammed and can be run through via the 'auto' command.\n" +
                     "> 0: Fool's Mate. Checkmate in four moves. Black wins.\n" +
                     "> 1: Reverse Fool's Mate. Checkmate in five moves. White wins.\n" +
-                    "> 2: Black King Long Rochade.\n" +
-                    "> 3: White King Short Rochade.\n" +
+                    "> 2: Black King Long Castle.\n" +
+                    "> 3: White King Short Castle.\n" +
                     "> 4: Pawn en Passant.\n" +
                     "> 5: Pawn transformation."
         )
