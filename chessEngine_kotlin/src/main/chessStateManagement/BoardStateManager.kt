@@ -95,8 +95,10 @@ open class BoardStateManager(
 
         val pieceRule = ruleBook.getRules(move.chessPiece)
 
-        val moveExec = pieceRule.canExecuteMove(move, getBoardState(),
-            getColorBoard(whiteTurn), getColorBoard(!whiteTurn))
+        val moveExec = pieceRule.canExecuteMove(
+            move, getBoardState(),
+            getColorBoard(whiteTurn), getColorBoard(!whiteTurn)
+        )
         if (moveExec.first) {
             when (moveExec.second!!) {
                 EMoveType.Move -> execMove(move.chessPiece, move)
@@ -106,7 +108,7 @@ open class BoardStateManager(
 
             checkKingRooksMoved(move.chessPiece, move.initialIndex)
             recordMove(move)
-            return Pair(true, if(pawnTransform) move else null)
+            return Pair(true, if (pawnTransform) move else null)
         }
         return Pair(false, null)
     }
@@ -214,17 +216,17 @@ open class BoardStateManager(
         }
     }
 
-    private fun recordMove(move: ChessMove){
+    private fun recordMove(move: ChessMove) {
         moveHistory.add(move)
     }
 
     /*called from pawn chess piece to notify future execution of pawn transformation at end of move execution*/
-    fun notifyPawnTransformation(){
+    fun notifyPawnTransformation() {
         pawnTransform = true
     }
 
     /*deletes pawn and puts chosen chess piece on the corresponding board*/
-    fun execPawnTransformation(move: ChessMove, transform: EPieceType){
+    fun execPawnTransformation(move: ChessMove, transform: EPieceType) {
         boards[move.chessPiece.ordinal] = flipBit(boards[move.chessPiece.ordinal], move.targetIndex)
         boards[transform.ordinal] = flipBit(boards[transform.ordinal], move.targetIndex)
         pawnTransform = false
@@ -250,7 +252,7 @@ open class BoardStateManager(
     }
 
     /*returns indices of squares surrounding the king at the given index*/
-    fun getKingPerimeter(index: Int): Array<Int> {
+    private fun getKingPerimeter(index: Int): Array<Int> {
         val perimeter = mutableListOf<Int>()
         for (step in omniDirectional) {
             if (willFileOverflow(index, index + step)
@@ -264,7 +266,7 @@ open class BoardStateManager(
     }
 
     /*returns bitboard with all squares that are occupied by allies*/
-    fun getAllyOccupiedSquares(indices: Array<Int>, isWPlayer: Boolean): ULong {
+    private fun getAllyOccupiedSquares(indices: Array<Int>, isWPlayer: Boolean): ULong {
         val allyBoard = getColorBoard(isWPlayer)
         return flipBits(empty, indices) and allyBoard
     }
@@ -282,7 +284,7 @@ open class BoardStateManager(
     }
 
     /*returns bitboard of all enemy threatened squares within the given indices array*/
-    fun getThreatenedSquares(indices: Array<Int>, isWPlayer: Boolean): ULong {
+    private fun getThreatenedSquares(indices: Array<Int>, isWPlayer: Boolean): ULong {
         var threatened: ULong = empty
         for (index in indices) {
             if (isSquareThreatened(index, isWPlayer)) {
@@ -301,7 +303,7 @@ open class BoardStateManager(
     }
 
     /*returns if the given square is threatened by any enemy pieces (done through simulation)*/
-    fun isSquareThreatened(index: Int, isWPlayer: Boolean): Boolean {
+    private fun isSquareThreatened(index: Int, isWPlayer: Boolean): Boolean {
         val enemyBoard = getColorBoard(!isWPlayer)
 
         //walk in all directions until enemy then check if it can attack square at index
@@ -347,8 +349,10 @@ open class BoardStateManager(
         val pieceRule = ruleBook.getRules(chessPiece)
 
         val white = isWhite(chessPiece)
-        return pieceRule.canExecuteMove(simulated, getBoardState(),
-            empty, getColorBoard(!white), true).first
+        return pieceRule.canExecuteMove(
+            simulated, getBoardState(),
+            empty, getColorBoard(!white), true
+        ).first
     }
 
     /*returns chess piece at the given index, color is irrelevant*/
@@ -391,7 +395,8 @@ open class BoardStateManager(
 
         val possibleMoves = pieceRule.getPieceMoveSet(
             move.initialIndex, getBoardState(),
-            getColorBoard(whiteTurn), getColorBoard(!whiteTurn))
+            getColorBoard(whiteTurn), getColorBoard(!whiteTurn)
+        )
 
         return Pair(chessPiece, getBoardIndices(possibleMoves.move))
     }

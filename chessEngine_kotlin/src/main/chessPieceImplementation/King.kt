@@ -21,11 +21,11 @@ class King(val bsm: BoardStateManager, piece: EPieceType) : SingleStep(piece, om
         return moves
     }
 
-    fun rochadeMove(index: Int): ULong {
+    private fun rochadeMove(index: Int): ULong {
         return shortRochade(index) xor longRochade(index)
     }
 
-    fun shortRochade(index: Int): ULong {
+    private fun shortRochade(index: Int): ULong {
         //check king and right rook not moved
         val kingRooksMoved = bsm.haveKingRooksMoved(isWhite(piece))
         if(kingRooksMoved.first || kingRooksMoved.third) return empty
@@ -40,7 +40,7 @@ class King(val bsm: BoardStateManager, piece: EPieceType) : SingleStep(piece, om
         return flipBit(empty, index + 2)
     }
 
-    fun longRochade(index: Int): ULong {
+    private fun longRochade(index: Int): ULong {
         //check king and right rook not moved
         val kingRooksMoved = bsm.haveKingRooksMoved(isWhite(piece))
         if(kingRooksMoved.first || kingRooksMoved.second) return empty
