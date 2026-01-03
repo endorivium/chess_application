@@ -13,9 +13,10 @@ import chessStateManagement.BoardStateManager
 import utils.isRank
 import utils.isWhite
 import utils.omniDirectional
+import utils.pawnAttackPattern
 import kotlin.math.abs
 
-class Pawn(private val bsm: BoardStateManager, piece: EPieceType) : SingleStep(piece = piece, omniDirectional) {
+class Pawn(private val bsm: BoardStateManager, piece: EPieceType) : SingleStep(piece = piece, pawnAttackPattern) {
 
     override fun getPieceMoveSet(index: Int, board: ULong, allyBoard: ULong, enemyBoard: ULong): MoveSet {
         val push = getPush(index, board)

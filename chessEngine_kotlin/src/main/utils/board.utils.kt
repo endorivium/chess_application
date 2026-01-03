@@ -9,6 +9,8 @@ val omniDiagonal = arrayOf(7, 9, -7, -9)
 val knightPattern = arrayOf(6, 15, 17, 10, -10, -17, -15, -6)
 val cardinal = arrayOf(1, 8, -1, -8)
 
+val pawnAttackPattern = arrayOf(7, 9)
+
 fun isWithinRanks(index: Int, lowerRank: Int, upperRank: Int): Boolean {
     return (index/8 + 1) in lowerRank..upperRank
 }
