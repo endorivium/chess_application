@@ -2,7 +2,7 @@
   <artifact type="jar" name="chessEngine:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/chessEngine_jar</output-path>
     <root id="archive" name="chessEngine.jar">
-      <element id="module-output" name="chessEngine" />
+      <element id="module-output" name="chessEngine_kotlin" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/kotlin/kotlin-stdlib/2.2.20/kotlin-stdlib-2.2.20.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/jetbrains/annotations/13.0/annotations-13.0.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/io/mockk/mockk-dsl-js/1.9.3.kotlin12/mockk-dsl-js-1.9.3.kotlin12.jar" path-in-jar="/" />
